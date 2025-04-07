@@ -1,11 +1,14 @@
 {
   "name": "jamb-mcp-server",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Jamb MCP Server implementing Model Context Protocol",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "jamb-mcp-server": "./dist/index.js"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/index.js",
     "start": "node dist/index.js",
     "dev": "node --loader ts-node/esm src/index.ts",
     "test": "node --loader ts-node/esm src/test.ts",
