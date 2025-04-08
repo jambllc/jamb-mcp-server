@@ -1,6 +1,6 @@
 {
   "name": "jamb-mcp-server",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Jamb MCP Server implementing Model Context Protocol",
   "main": "dist/index.js",
   "type": "module",
