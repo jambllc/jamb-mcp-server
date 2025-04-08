@@ -1,20 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import { getSchemaFromOpenAPI } from "./schema-transformer.js"
-import { createLVAPIClient, generateSchemaDescription } from "./utils.js"
+import { createLVAPIClient } from "./utils.js"
 
 export async function addThemeTools(
   server: McpServer,
   serverUrl: string
 ) {
-  // Dynamically fetch and convert Theme schema
   let ThemeSchema: z.ZodTypeAny
-  // let RawThemeSchema: any
   try {
-    const response = await fetch(`${serverUrl}/openapi.json`)
-    const openAPISpec = await response.json()
-    // RawThemeSchema = openAPISpec.components?.schemas?.Theme
-
     ThemeSchema = await getSchemaFromOpenAPI(
       `${serverUrl}/openapi.json`,
       "Theme"
@@ -22,14 +16,14 @@ export async function addThemeTools(
   } catch (error) {
     console.error("Failed to generate Theme schema:", error)
     ThemeSchema = z.any() // Fallback to any if schema generation fails
-    // RawThemeSchema = {}
   }
 
   // Tool to read current theme configuration
   server.tool(
     "read_theme",
-    `* Gets the "theme" information for the site. These are all colors, font and other css settings for the site.
-* Always read before update as you need to pass the entire object to update.`,
+    `* Gets the "theme" information for the site. These are all colors, fonts, spacing, and other visual styling settings for the site.
+* The response contains the complete theme object with all its properties.
+* Always read before update as you need to pass the entire object back when updating, even if only changing one color.`,
     {
       token: z.string(),
       site: z.string(),
@@ -63,9 +57,10 @@ export async function addThemeTools(
   // Tool to update theme configuration
   server.tool(
     "update_theme",
-      `* Updates the "Theme" information for the site. This includes name, address, and other details like services.
-* The ENTIRE object needs to be saved even if only one field is updated.
-* Optional fields can be omitted`,
+      `* Updates the "Theme" information for the site. This includes colors, fonts, spacing, and other visual styling settings.
+* The ENTIRE object needs to be saved even if only one field is updated - make sure to read first.
+* Optional fields can be omitted or set to null.
+* Changes to the theme will affect the entire visual appearance of the website.`,
     {
       token: z.string(),
       site: z.string(),

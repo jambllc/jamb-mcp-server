@@ -1,20 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import { getSchemaFromOpenAPI } from "./schema-transformer.js"
-import { createLVAPIClient, generateSchemaDescription } from "./utils.js"
+import { createLVAPIClient } from "./utils.js"
 
 export async function addWebsiteConfigTools(
   server: McpServer,
   serverUrl: string
 ) {
-  // Dynamically fetch and convert WebsiteConfig schema
   let WebsiteConfigSchema: z.ZodTypeAny
-  // let RawWebsiteConfigSchema: any
   try {
-    const response = await fetch(`${serverUrl}/openapi.json`)
-    const openAPISpec = await response.json()
-    // RawWebsiteConfigSchema = openAPISpec.components?.schemas?.WebsiteConfig
-
     WebsiteConfigSchema = await getSchemaFromOpenAPI(
       `${serverUrl}/openapi.json`,
       "WebsiteConfig"
@@ -22,16 +16,15 @@ export async function addWebsiteConfigTools(
   } catch (error) {
     console.error("Failed to generate WebsiteConfig schema:", error)
     WebsiteConfigSchema = z.any() // Fallback to any if schema generation fails
-    // RawWebsiteConfigSchema = {}
   }
 
   // Tool to read current website configuration
   server.tool(
     "read_website_config",
-      `* Gets the "Website Config" information for the site. 
-* This includes what pages are in the top navigation, ctas, pages available overall and the sections they have.
-* This is a large object and can be used to generate the website.
-* Always read before update as you need to pass the entire object to update.`,
+      `* Gets the complete "Website Config" information for the site. 
+* This includes navigation menu items, call-to-action buttons, page configurations, sections on each page, forms, and more.
+* The response is a complex object with nested arrays and objects that defines the entire website structure.
+* Always read before update as you need to pass the entire object back when updating, even if only changing one part.`,
     {
       token: z.string(),
       site: z.string(),
@@ -66,8 +59,9 @@ export async function addWebsiteConfigTools(
   server.tool(
     "update_website_config",
       `* Updates the "Website Config" information for the site. 
-* The ENTIRE object needs to be saved even if only one field is updated.
-* Optional fields can be omitted`,
+* The ENTIRE object needs to be saved even if only one field is updated - make sure to read first.
+* Optional fields can be omitted, but required fields (navigation, pageConfig) must always be included.
+* Changing this affects the overall site structure, navigation, and page layouts.`,
     {
       token: z.string(),
       site: z.string(),

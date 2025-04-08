@@ -26,8 +26,10 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to list all products
   server.tool(
     "list_products",
-    `* List all products for a site. Products are physical items for sale (food on a menu, products in the stor).
-* Always read before update as you need to pass the entire object to update.`,
+    `* Lists all products for a site. Products are physical items for sale (food on a menu, products in a store, etc.).
+* The response is an array of all product objects, each with its full details.
+* Use this before creating or updating products to see what already exists.
+* If no products exist, an empty array will be returned.`,
     {
       token: z.string(),
       site: z.string(),
@@ -61,8 +63,10 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to list all product groups
   server.tool(
     "list_product_groups",
-      `* List all products groups for a site. Products Groups are collection of products that belongs together (drinks on a food menu for example).
-* Always read before update as you need to pass the entire object to update.`,
+      `* Lists all product groups for a site. Product Groups are collections of products that belong together (e.g., drinks on a food menu, product categories).
+* The response is an array of all product group objects, each with its full details.
+* Use this before creating or updating product groups to see what already exists.
+* If no product groups exist, an empty array will be returned.`,
     {
       token: z.string(),
       site: z.string(),
@@ -100,9 +104,10 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to create/update multiple products
   server.tool(
     "bulk_upsert_products",
-      `* Updates one or more "Products" for the site.
-* Products are matched on "slug", so make sure to use the right one and unique one for creating.
-* The ENTIRE objects needs to be saved even if only one field is updated.
+      `* Creates or updates multiple "Products" for the site in a single operation.
+* Products are matched on "slug" - existing products with matching slugs will be updated, new slugs will create new products.
+* For each product, the ENTIRE object needs to be included, even if only one field is being updated.
+* Required fields for each product include: description, name, slug.
 * Optional fields can be omitted.`,
     {
       token: z.string(),
@@ -143,9 +148,10 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to create/update multiple product groups
   server.tool(
     "bulk_upsert_product_groups",
-      `* Updates one or more "ProductsGroups" for the site.
-* Product Groups are matched on "slug", so make sure to use the right one and unique one for creating.
-* The ENTIRE objects needs to be saved even if only one field is updated.
+      `* Creates or updates multiple "Product Groups" for the site in a single operation.
+* Product Groups are matched on "slug" - existing groups with matching slugs will be updated, new slugs will create new groups.
+* For each product group, the ENTIRE object needs to be included, even if only one field is being updated.
+* Required fields for each product group include: description, name, slug.
 * Optional fields can be omitted.`,
     {
       token: z.string(),
