@@ -9,11 +9,11 @@ export async function addThemeTools(
 ) {
   // Dynamically fetch and convert Theme schema
   let ThemeSchema: z.ZodTypeAny
-  let RawThemeSchema: any
+  // let RawThemeSchema: any
   try {
     const response = await fetch(`${serverUrl}/openapi.json`)
     const openAPISpec = await response.json()
-    RawThemeSchema = openAPISpec.components?.schemas?.Theme
+    // RawThemeSchema = openAPISpec.components?.schemas?.Theme
 
     ThemeSchema = await getSchemaFromOpenAPI(
       `${serverUrl}/openapi.json`,
@@ -22,32 +22,14 @@ export async function addThemeTools(
   } catch (error) {
     console.error("Failed to generate Theme schema:", error)
     ThemeSchema = z.any() // Fallback to any if schema generation fails
-    RawThemeSchema = {}
+    // RawThemeSchema = {}
   }
-
-  // Tool to describe the theme schema
-  server.tool("describe_theme_schema", {}, async () => ({
-    content: [
-      {
-        type: "text",
-        text: `Theme Schema Description:
-
-${generateSchemaDescription(RawThemeSchema)}
-
-How to use this schema:
-1. This represents the complete theme configuration structure
-2. Required fields MUST be provided when creating or updating
-3. Optional fields can be omitted or set to null
-4. Nested objects follow the same required/optional rules
-5. Each field has a specific type (string, number, array, etc.)
-6. When updating, include all required fields even if they're not changing`,
-      },
-    ],
-  }))
 
   // Tool to read current theme configuration
   server.tool(
     "read_theme",
+    `* Gets the "theme" information for the site. These are all colors, font and other css settings for the site.
+* Always read before update as you need to pass the entire object to update.`,
     {
       token: z.string(),
       site: z.string(),
@@ -81,6 +63,9 @@ How to use this schema:
   // Tool to update theme configuration
   server.tool(
     "update_theme",
+      `* Updates the "Theme" information for the site. This includes name, address, and other details like services.
+* The ENTIRE object needs to be saved even if only one field is updated.
+* Optional fields can be omitted`,
     {
       token: z.string(),
       site: z.string(),

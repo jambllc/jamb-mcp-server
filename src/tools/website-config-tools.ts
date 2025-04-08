@@ -9,11 +9,11 @@ export async function addWebsiteConfigTools(
 ) {
   // Dynamically fetch and convert WebsiteConfig schema
   let WebsiteConfigSchema: z.ZodTypeAny
-  let RawWebsiteConfigSchema: any
+  // let RawWebsiteConfigSchema: any
   try {
     const response = await fetch(`${serverUrl}/openapi.json`)
     const openAPISpec = await response.json()
-    RawWebsiteConfigSchema = openAPISpec.components?.schemas?.WebsiteConfig
+    // RawWebsiteConfigSchema = openAPISpec.components?.schemas?.WebsiteConfig
 
     WebsiteConfigSchema = await getSchemaFromOpenAPI(
       `${serverUrl}/openapi.json`,
@@ -22,32 +22,16 @@ export async function addWebsiteConfigTools(
   } catch (error) {
     console.error("Failed to generate WebsiteConfig schema:", error)
     WebsiteConfigSchema = z.any() // Fallback to any if schema generation fails
-    RawWebsiteConfigSchema = {}
+    // RawWebsiteConfigSchema = {}
   }
-
-  // Tool to describe the website config schema
-  server.tool("describe_website_config_schema", {}, async () => ({
-    content: [
-      {
-        type: "text",
-        text: `Website Configuration Schema Description:
-
-${generateSchemaDescription(RawWebsiteConfigSchema)}
-
-How to use this schema:
-1. This represents the complete website configuration structure
-2. Required fields MUST be provided when creating or updating
-3. Optional fields can be omitted or set to null
-4. Nested objects follow the same required/optional rules
-5. Each field has a specific type (string, number, array, etc.)
-6. When updating, include all required fields even if they're not changing`,
-      },
-    ],
-  }))
 
   // Tool to read current website configuration
   server.tool(
     "read_website_config",
+      `* Gets the "Website Config" information for the site. 
+* This includes what pages are in the top navigation, ctas, pages available overall and the sections they have.
+* This is a large object and can be used to generate the website.
+* Always read before update as you need to pass the entire object to update.`,
     {
       token: z.string(),
       site: z.string(),
@@ -81,6 +65,9 @@ How to use this schema:
   // Tool to update website configuration
   server.tool(
     "update_website_config",
+      `* Updates the "Website Config" information for the site. 
+* The ENTIRE object needs to be saved even if only one field is updated.
+* Optional fields can be omitted`,
     {
       token: z.string(),
       site: z.string(),

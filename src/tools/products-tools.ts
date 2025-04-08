@@ -26,6 +26,8 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to list all products
   server.tool(
     "list_products",
+    `* List all products for a site. Products are physical items for sale (food on a menu, products in the stor).
+* Always read before update as you need to pass the entire object to update.`,
     {
       token: z.string(),
       site: z.string(),
@@ -59,6 +61,8 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to list all product groups
   server.tool(
     "list_product_groups",
+      `* List all products groups for a site. Products Groups are collection of products that belongs together (drinks on a food menu for example).
+* Always read before update as you need to pass the entire object to update.`,
     {
       token: z.string(),
       site: z.string(),
@@ -96,6 +100,10 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to create/update multiple products
   server.tool(
     "bulk_upsert_products",
+      `* Updates one or more "Products" for the site.
+* Products are matched on "slug", so make sure to use the right one and unique one for creating.
+* The ENTIRE objects needs to be saved even if only one field is updated.
+* Optional fields can be omitted.`,
     {
       token: z.string(),
       site: z.string(),
@@ -135,6 +143,10 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to create/update multiple product groups
   server.tool(
     "bulk_upsert_product_groups",
+      `* Updates one or more "ProductsGroups" for the site.
+* Product Groups are matched on "slug", so make sure to use the right one and unique one for creating.
+* The ENTIRE objects needs to be saved even if only one field is updated.
+* Optional fields can be omitted.`,
     {
       token: z.string(),
       site: z.string(),
@@ -174,6 +186,8 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to delete a single product
   server.tool(
     "delete_product",
+      `* Deletes a "Product" from the site.
+* This cannot be undone so make sure it is the right slug.`,
     {
       token: z.string(),
       site: z.string(),
@@ -210,6 +224,8 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
   // Tool to delete a single product group
   server.tool(
     "delete_product_group",
+      `* Deletes a "Product Group" from the site.
+* This cannot be undone so make sure it is the right slug.`,
     {
       token: z.string(),
       site: z.string(),

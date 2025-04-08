@@ -1,16 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
-import { getSchemaFromOpenAPI } from "./schema-transformer.js"
+import {getSchemaFromOpenAPI, printZodSchema} from "./schema-transformer.js"
 import { createLVAPIClient, generateSchemaDescription } from "./utils.js"
 
 export async function addBusinessTools(server: McpServer, serverUrl: string) {
   // Dynamically fetch and convert Business schema
   let BusinessSchema: z.ZodTypeAny
-  let RawBusinessSchema: any
+  // let RawBusinessSchema: any
   try {
     const response = await fetch(`${serverUrl}/openapi.json`)
     const openAPISpec = await response.json()
-    RawBusinessSchema = openAPISpec.components?.schemas?.Business
+    // RawBusinessSchema = openAPISpec.components?.schemas?.Business
 
     BusinessSchema = await getSchemaFromOpenAPI(
       `${serverUrl}/openapi.json`,
@@ -19,32 +19,14 @@ export async function addBusinessTools(server: McpServer, serverUrl: string) {
   } catch (error) {
     console.error("Failed to generate Business schema:", error)
     BusinessSchema = z.any() // Fallback to any if schema generation fails
-    RawBusinessSchema = {}
+    // RawBusinessSchema = {}
   }
-
-  // Tool to describe the business schema
-  server.tool("describe_business_schema", {}, async () => ({
-    content: [
-      {
-        type: "text",
-        text: `Business Schema Description:
-
-${generateSchemaDescription(RawBusinessSchema)}
-
-How to use this schema:
-1. This represents the complete business profile structure
-2. Required fields MUST be provided when creating or updating a business
-3. Optional fields can be omitted or set to null
-4. Nested objects follow the same required/optional rules
-5. Each field has a specific type (string, number, array, etc.)
-6. When updating, include all required fields even if they're not changing`,
-      },
-    ],
-  }))
 
   // Tool to read current business information
   server.tool(
     "read_business",
+      `* Gets the "business" information for the site. This includes name, address, and other details like services.
+* Always read before update as you need to pass the entire object to update.`,
     {
       token: z.string(),
       site: z.string(),
@@ -78,6 +60,9 @@ How to use this schema:
   // Tool to update business information
   server.tool(
     "update_business",
+      `* Updates the "business" information for the site. This includes name, address, and other details like services.
+* The ENTIRE object needs to be saved even if only one field is updated.
+* Optional fields can be omitted`,
     {
       token: z.string(),
       site: z.string(),
