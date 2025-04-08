@@ -5,8 +5,10 @@ import { createLVAPIClient } from "./utils.js"
 
 export async function addThemeTools(
   server: McpServer,
-  serverUrl: string
+  serverUrl: string,
+  token: string
 ) {
+  // Dynamically fetch and convert Theme schema
   let ThemeSchema: z.ZodTypeAny
   try {
     ThemeSchema = await getSchemaFromOpenAPI(
@@ -18,17 +20,16 @@ export async function addThemeTools(
     ThemeSchema = z.any() // Fallback to any if schema generation fails
   }
 
-  // Tool to read current theme configuration
+  // Tool to read current theme
   server.tool(
     "read_theme",
-    `* Gets the "theme" information for the site. These are all colors, fonts, spacing, and other visual styling settings for the site.
-* The response contains the complete theme object with all its properties.
-* Always read before update as you need to pass the entire object back when updating, even if only changing one color.`,
+    `* Gets the current theme configuration for the site.
+* The response contains the complete theme object with all styling properties.
+* Always read before update as you need to pass the entire object back when updating, even if only changing one field.`,
     {
-      token: z.string(),
       site: z.string(),
     },
-    async ({ token, site }) => {
+    async ({ site }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
         const theme = await client.api.v1SiteThemeList()
@@ -54,25 +55,22 @@ export async function addThemeTools(
     }
   )
 
-  // Tool to update theme configuration
+  // Tool to update theme
   server.tool(
     "update_theme",
-      `* Updates the "Theme" information for the site. This includes colors, fonts, spacing, and other visual styling settings.
+    `* Updates the theme configuration for the site.
 * The ENTIRE object needs to be saved even if only one field is updated - make sure to read first.
-* Optional fields can be omitted or set to null.
-* Changes to the theme will affect the entire visual appearance of the website.`,
+* Optional fields can be omitted or set to null, but required fields must always be included.`,
     {
-      token: z.string(),
       site: z.string(),
       theme: ThemeSchema,
     },
-    async ({ token, site, theme }) => {
+    async ({ site, theme }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
         // First validate the theme data
-        const validationResult =
-          await client.api.v1ValidateThemeCreate(theme)
+        const validationResult = await client.api.v1ValidateThemeCreate(theme)
 
         // Check if validation result contains any errors
         const validationErrors = validationResult.data || []
@@ -88,7 +86,7 @@ export async function addThemeTools(
           }
         }
 
-        // If validation passes, update the theme configuration
+        // If validation passes, update the theme
         const updatedTheme = await client.api.v1SiteThemeCreate(theme)
         return {
           content: [

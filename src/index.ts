@@ -3,7 +3,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js"
-import { z } from "zod"
 import express from "express"
 import { addBusinessTools } from "./tools/business-tools.js"
 import * as process from "process"
@@ -36,21 +35,19 @@ const cmdArgs = parseArgs()
 // 3. Default values
 const SERVER_URL =
   cmdArgs["server-url"] || process.env.LV_SERVER_URL || "http://localhost:8001"
+const TOKEN = cmdArgs["token"] || process.env.LV_TOKEN
+
+if (!TOKEN || !SERVER_URL) {
+  console.error(
+    "Error: Both LV_SERVER_URL and LV_TOKEN must be provided via command line or environment variables."
+  )
+  process.exit(1)
+}
 
 const server = new McpServer({
   name: "Jamb MCP Server",
   version: "1.0.0",
 })
-
-// Basic echo tool
-server.tool("echo", { message: z.string() }, async ({ message }) => ({
-  content: [
-    {
-      type: "text",
-      text: `Echo: ${message}`,
-    },
-  ],
-}))
 
 // HTTP/SSE Transport Setup
 async function startHttpServer() {
@@ -86,11 +83,19 @@ async function startHttpServer() {
 
 // Main execution
 async function main() {
+  // Validate that TOKEN is provided
+  if (!TOKEN) {
+    console.error(
+      "Error: Token is required. Please provide via --token or LV_TOKEN environment variable."
+    )
+    process.exit(1)
+  }
+
   // Add business tools dynamically
-  await addBusinessTools(server, SERVER_URL)
-  await addWebsiteConfigTools(server, SERVER_URL)
-  await addThemeTools(server, SERVER_URL)
-  await addProductsTools(server, SERVER_URL)
+  await addBusinessTools(server, SERVER_URL, TOKEN)
+  await addWebsiteConfigTools(server, SERVER_URL, TOKEN)
+  await addThemeTools(server, SERVER_URL, TOKEN)
+  await addProductsTools(server, SERVER_URL, TOKEN)
 
   const transport =
     process.env.TRANSPORT === "http"

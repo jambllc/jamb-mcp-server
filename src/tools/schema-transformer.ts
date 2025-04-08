@@ -1,52 +1,53 @@
 import { z } from "zod"
 
 export function printZodSchema(schema: z.ZodTypeAny, indent = 0): string {
-  const indentStr = ' '.repeat(indent * 2);
-  const description = schema.description || 'No description';
+  const indentStr = " ".repeat(indent * 2)
+  const description = schema.description || "No description"
 
-  let output = `${indentStr}Description: ${description}\n`;
+  let output = `${indentStr}Description: ${description}\n`
 
-  if ('shape' in schema) {
+  if ("shape" in schema) {
     // Handle object schemas
-    output += `${indentStr}Type: object\n`;
-    output += `${indentStr}Properties:\n`;
+    output += `${indentStr}Type: object\n`
+    output += `${indentStr}Properties:\n`
 
     // @ts-ignore
     for (const [key, value] of Object.entries(schema.shape)) {
-      output += `${indentStr}  ${key}:\n`;
+      output += `${indentStr}  ${key}:\n`
       // @ts-ignore
-      output += printZodSchema(value, indent + 2);
+      output += printZodSchema(value, indent + 2)
     }
   } else if (schema instanceof z.ZodString) {
-    output += `${indentStr}Type: string\n`;
+    output += `${indentStr}Type: string\n`
   } else if (schema instanceof z.ZodNumber) {
-    output += `${indentStr}Type: number\n`;
+    output += `${indentStr}Type: number\n`
   } else if (schema instanceof z.ZodBoolean) {
-    output += `${indentStr}Type: boolean\n`;
+    output += `${indentStr}Type: boolean\n`
   } else if (schema instanceof z.ZodArray) {
-    output += `${indentStr}Type: array\n`;
-    output += `${indentStr}Items:\n`;
-    output += printZodSchema(schema.element, indent + 1);
+    output += `${indentStr}Type: array\n`
+    output += `${indentStr}Items:\n`
+    output += printZodSchema(schema.element, indent + 1)
   } else if (schema instanceof z.ZodEnum) {
-    output += `${indentStr}Type: enum\n`;
-    output += `${indentStr}Values: ${(schema as any)._def.values.join(', ')}\n`;
+    output += `${indentStr}Type: enum\n`
+    output += `${indentStr}Values: ${(schema as any)._def.values.join(", ")}\n`
   } else if (schema instanceof z.ZodUnion) {
-    output += `${indentStr}Type: union\n`;
-    (schema as any)._def.options.forEach((option: z.ZodTypeAny, index: number) => {
-      output += `${indentStr}Option ${index + 1}:\n`;
-      output += printZodSchema(option, indent + 1);
-    });
+    output += `${indentStr}Type: union\n`
+    ;(schema as any)._def.options.forEach(
+      (option: z.ZodTypeAny, index: number) => {
+        output += `${indentStr}Option ${index + 1}:\n`
+        output += printZodSchema(option, indent + 1)
+      }
+    )
   } else if (schema instanceof z.ZodNullable) {
-    output += `${indentStr}Type: nullable\n`;
-    output += `${indentStr}Inner schema:\n`;
-    output += printZodSchema((schema as any)._def.innerType, indent + 1);
+    output += `${indentStr}Type: nullable\n`
+    output += `${indentStr}Inner schema:\n`
+    output += printZodSchema((schema as any)._def.innerType, indent + 1)
   } else {
-    output += `${indentStr}Type: ${schema.constructor.name}\n`;
+    output += `${indentStr}Type: ${schema.constructor.name}\n`
   }
 
-  return output;
+  return output
 }
-
 
 // Store the OpenAPI spec globally to avoid passing it around
 let _openAPISpec: any
@@ -64,7 +65,10 @@ function resolveRef(ref: string): any {
 }
 
 // Helper function to add description to a schema if available
-function addDescription(zodSchema: z.ZodTypeAny, openAPISchema: any): z.ZodTypeAny {
+function addDescription(
+  zodSchema: z.ZodTypeAny,
+  openAPISchema: any
+): z.ZodTypeAny {
   if (openAPISchema.description) {
     return zodSchema.describe(openAPISchema.description)
   }
@@ -72,22 +76,20 @@ function addDescription(zodSchema: z.ZodTypeAny, openAPISchema: any): z.ZodTypeA
 }
 
 // Helper function to apply string constraints (min/max length, pattern)
-function applyStringConstraints(
-  schema: any
-): z.ZodString {
+function applyStringConstraints(schema: any): z.ZodString {
   let result = z.string()
 
   // Apply min length
   if (schema.minLength !== undefined) {
     result = result.min(schema.minLength, {
-      message: `String must be at least ${schema.minLength} characters`
+      message: `String must be at least ${schema.minLength} characters`,
     })
   }
 
   // Apply max length
   if (schema.maxLength !== undefined) {
     result = result.max(schema.maxLength, {
-      message: `String must be at most ${schema.maxLength} characters`
+      message: `String must be at most ${schema.maxLength} characters`,
     })
   }
 
@@ -96,7 +98,8 @@ function applyStringConstraints(
     try {
       const regex = new RegExp(schema.pattern)
       result = result.regex(regex, {
-        message: schema.patternMessage || 'String must match the required pattern'
+        message:
+          schema.patternMessage || "String must match the required pattern",
       })
     } catch (error) {
       console.warn(`Invalid regex pattern: ${schema.pattern}`)
@@ -107,22 +110,20 @@ function applyStringConstraints(
 }
 
 // Helper function to apply number constraints (min/max)
-function applyNumberConstraints(
-  schema: any
-): z.ZodNumber {
+function applyNumberConstraints(schema: any): z.ZodNumber {
   let result = z.number()
 
   // Apply minimum
   if (schema.minimum !== undefined) {
     result = result.min(schema.minimum, {
-      message: `Number must be at least ${schema.minimum}`
+      message: `Number must be at least ${schema.minimum}`,
     })
   }
 
   // Apply maximum
   if (schema.maximum !== undefined) {
     result = result.max(schema.maximum, {
-      message: `Number must be at most ${schema.maximum}`
+      message: `Number must be at most ${schema.maximum}`,
     })
   }
 
@@ -200,13 +201,13 @@ export function convertOpenAPISchemaToZod(schema: any): z.ZodTypeAny {
         // Apply array constraints
         if (schema.minItems !== undefined) {
           arraySchema = arraySchema.min(schema.minItems, {
-            message: `Array must contain at least ${schema.minItems} items`
+            message: `Array must contain at least ${schema.minItems} items`,
           })
         }
 
         if (schema.maxItems !== undefined) {
           arraySchema = arraySchema.max(schema.maxItems, {
-            message: `Array must contain at most ${schema.maxItems} items`
+            message: `Array must contain at most ${schema.maxItems} items`,
           })
         }
 
@@ -249,11 +250,13 @@ export function convertOpenAPISchemaToZod(schema: any): z.ZodTypeAny {
       if (schema.anyOf) {
         // Special case: if anyOf contains a string-or-null pattern
         if (schema.anyOf.length === 2) {
-            const nonNullSchema = schema.anyOf.filter((s: any) => s.type !== 'null')
-            if (nonNullSchema.length === 1) {
-              // console.log("Detected string-or-null pattern", nonNullSchema[0])
-              return convertOpenAPISchemaToZod(nonNullSchema[0]).optional()
-            }
+          const nonNullSchema = schema.anyOf.filter(
+            (s: any) => s.type !== "null"
+          )
+          if (nonNullSchema.length === 1) {
+            // console.log("Detected string-or-null pattern", nonNullSchema[0])
+            return convertOpenAPISchemaToZod(nonNullSchema[0]).optional()
+          }
         }
         zodSchema = z.union(schema.anyOf.map(convertOpenAPISchemaToZod))
       } else if (schema.oneOf) {
@@ -277,7 +280,9 @@ export function convertOpenAPISchemaToZod(schema: any): z.ZodTypeAny {
                   fieldSchema = fieldSchema.describe(prop.description)
                 }
 
-                mergedShape[key] = isRequired ? fieldSchema : fieldSchema.optional()
+                mergedShape[key] = isRequired
+                  ? fieldSchema
+                  : fieldSchema.optional()
                 if (isRequired) {
                   mergedRequired.push(key)
                 }
@@ -292,12 +297,12 @@ export function convertOpenAPISchemaToZod(schema: any): z.ZodTypeAny {
         zodSchema = convertOpenAPISchemaToZod({
           ...schema,
           type: schema.type || "any",
-          nullable: undefined
+          nullable: undefined,
         }).nullable()
       } else {
         // Handle objects without explicit type
         if (schema.properties) {
-          return convertOpenAPISchemaToZod({...schema, type: "object"})
+          return convertOpenAPISchemaToZod({ ...schema, type: "object" })
         }
         zodSchema = z.any()
       }

@@ -5,8 +5,10 @@ import { createLVAPIClient } from "./utils.js"
 
 export async function addWebsiteConfigTools(
   server: McpServer,
-  serverUrl: string
+  serverUrl: string,
+  token: string
 ) {
+  // Dynamically fetch and convert WebsiteConfig schema
   let WebsiteConfigSchema: z.ZodTypeAny
   try {
     WebsiteConfigSchema = await getSchemaFromOpenAPI(
@@ -21,15 +23,13 @@ export async function addWebsiteConfigTools(
   // Tool to read current website configuration
   server.tool(
     "read_website_config",
-      `* Gets the complete "Website Config" information for the site. 
-* This includes navigation menu items, call-to-action buttons, page configurations, sections on each page, forms, and more.
-* The response is a complex object with nested arrays and objects that defines the entire website structure.
-* Always read before update as you need to pass the entire object back when updating, even if only changing one part.`,
+    `* Gets the current website configuration.
+* The response contains the complete website configuration object.
+* Always read before update as you need to pass the entire object back when updating, even if only changing one field.`,
     {
-      token: z.string(),
       site: z.string(),
     },
-    async ({ token, site }) => {
+    async ({ site }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
         const websiteConfig = await client.api.v1SiteWebsiteConfigList()
@@ -46,7 +46,7 @@ export async function addWebsiteConfigTools(
           content: [
             {
               type: "text",
-              text: `Error reading website configuration: ${error instanceof Error ? error.message : String(error)}`,
+              text: `Error reading website config: ${error instanceof Error ? error.message : String(error)}`,
             },
           ],
           isError: true,
@@ -58,16 +58,14 @@ export async function addWebsiteConfigTools(
   // Tool to update website configuration
   server.tool(
     "update_website_config",
-      `* Updates the "Website Config" information for the site. 
+    `* Updates the website configuration for the site.
 * The ENTIRE object needs to be saved even if only one field is updated - make sure to read first.
-* Optional fields can be omitted, but required fields (navigation, pageConfig) must always be included.
-* Changing this affects the overall site structure, navigation, and page layouts.`,
+* Optional fields can be omitted or set to null, but required fields must always be included.`,
     {
-      token: z.string(),
       site: z.string(),
       website_config: WebsiteConfigSchema,
     },
-    async ({ token, site, website_config }) => {
+    async ({ site, website_config }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
@@ -89,7 +87,7 @@ export async function addWebsiteConfigTools(
           }
         }
 
-        // If validation passes, update the website configuration
+        // If validation passes, update the website config
         const updatedWebsiteConfig =
           await client.api.v1SiteWebsiteConfigCreate(website_config)
         return {
@@ -105,7 +103,7 @@ export async function addWebsiteConfigTools(
           content: [
             {
               type: "text",
-              text: `Error updating website configuration: ${error instanceof Error ? error.message : String(error)}`,
+              text: `Error updating website config: ${error instanceof Error ? error.message : String(error)}`,
             },
           ],
           isError: true,

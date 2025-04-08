@@ -1,9 +1,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
-import {getSchemaFromOpenAPI} from "./schema-transformer.js"
+import { getSchemaFromOpenAPI } from "./schema-transformer.js"
 import { createLVAPIClient } from "./utils.js"
 
-export async function addBusinessTools(server: McpServer, serverUrl: string) {
+export async function addBusinessTools(
+  server: McpServer,
+  serverUrl: string,
+  token: string
+) {
   // Dynamically fetch and convert Business schema
   let BusinessSchema: z.ZodTypeAny
   try {
@@ -19,14 +23,13 @@ export async function addBusinessTools(server: McpServer, serverUrl: string) {
   // Tool to read current business information
   server.tool(
     "read_business",
-      `* Gets the "business" information for the site. This includes name, address, services, hours, locations, and other core business details.
+    `* Gets the "business" information for the site. This includes name, address, services, hours, locations, and other core business details.
 * The response contains the complete business object with all properties.
 * Always read before update as you need to pass the entire object back when updating, even if only changing one field.`,
     {
-      token: z.string(),
       site: z.string(),
     },
-    async ({ token, site }) => {
+    async ({ site }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
         const business = await client.api.v1SiteBusinessList()
@@ -55,16 +58,15 @@ export async function addBusinessTools(server: McpServer, serverUrl: string) {
   // Tool to update business information
   server.tool(
     "update_business",
-      `* Updates the "business" information for the site. This includes name, address, services, hours, locations, and other core business details.
+    `* Updates the "business" information for the site. This includes name, address, services, hours, locations, and other core business details.
 * The ENTIRE object needs to be saved even if only one field is updated - make sure to read first.
 * Optional fields can be omitted or set to null, but required fields must always be included.
 * Required fields include: name, description, intro, category, about, hours, locations, payment, services.`,
     {
-      token: z.string(),
       site: z.string(),
       business: BusinessSchema,
     },
-    async ({ token, site, business }) => {
+    async ({ site, business }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 

@@ -3,11 +3,14 @@ import { z } from "zod"
 import { getSchemaFromOpenAPI } from "./schema-transformer.js"
 import { createLVAPIClient } from "./utils.js"
 
-export async function addProductsTools(server: McpServer, serverUrl: string) {
-  // Dynamically fetch and convert Products and ProductGroup schemas
+export async function addProductsTools(
+  server: McpServer,
+  serverUrl: string,
+  token: string
+) {
+  // Dynamically fetch and convert Product and ProductGroup schemas
   let ProductSchema: z.ZodTypeAny
   let ProductGroupSchema: z.ZodTypeAny
-
   try {
     ProductSchema = await getSchemaFromOpenAPI(
       `${serverUrl}/openapi.json`,
@@ -18,31 +21,28 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
       "ProductGroup"
     )
   } catch (error) {
-    console.error("Failed to generate Products/ProductGroup schemas:", error)
-    ProductSchema = z.any()
+    console.error("Failed to generate Product/ProductGroup schemas:", error)
+    ProductSchema = z.any() // Fallback to any if schema generation fails
     ProductGroupSchema = z.any()
   }
 
-  // Tool to list all products
+  // Tool to list products
   server.tool(
     "list_products",
-    `* Lists all products for a site. Products are physical items for sale (food on a menu, products in a store, etc.).
-* The response is an array of all product objects, each with its full details.
-* Use this before creating or updating products to see what already exists.
-* If no products exist, an empty array will be returned.`,
+    `* Lists all products for the site.
+* Returns an array of product objects with their details.`,
     {
-      token: z.string(),
       site: z.string(),
     },
-    async ({ token, site }) => {
+    async ({ site }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
-        const productsConfig = await client.api.v1SiteProductConfigList()
+        const products = await client.api.v1SiteProductsList()
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(productsConfig.data.products || [], null, 2),
+              text: JSON.stringify(products, null, 2),
             },
           ],
         }
@@ -60,30 +60,23 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
     }
   )
 
-  // Tool to list all product groups
+  // Tool to list product groups
   server.tool(
     "list_product_groups",
-      `* Lists all product groups for a site. Product Groups are collections of products that belong together (e.g., drinks on a food menu, product categories).
-* The response is an array of all product group objects, each with its full details.
-* Use this before creating or updating product groups to see what already exists.
-* If no product groups exist, an empty array will be returned.`,
+    `* Lists all product groups for the site.
+* Returns an array of product group objects with their details.`,
     {
-      token: z.string(),
       site: z.string(),
     },
-    async ({ token, site }) => {
+    async ({ site }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
-        const productsConfig = await client.api.v1SiteProductConfigList()
+        const productGroups = await client.api.v1SiteProductGroupsList()
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(
-                productsConfig.data.productGroups || [],
-                null,
-                2
-              ),
+              text: JSON.stringify(productGroups, null, 2),
             },
           ],
         }
@@ -101,33 +94,54 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
     }
   )
 
-  // Tool to create/update multiple products
+  // Tool to bulk upsert products
   server.tool(
     "bulk_upsert_products",
-      `* Creates or updates multiple "Products" for the site in a single operation.
-* Products are matched on "slug" - existing products with matching slugs will be updated, new slugs will create new products.
-* For each product, the ENTIRE object needs to be included, even if only one field is being updated.
-* Required fields for each product include: description, name, slug.
-* Optional fields can be omitted.`,
+    `* Creates or updates multiple products in bulk.
+* Provide an array of products to be created or updated.
+* Products are matched by their slug.
+* If a product with the given slug exists, it will be updated; otherwise, a new product will be created.`,
     {
-      token: z.string(),
       site: z.string(),
       products: z.array(ProductSchema),
     },
-    async ({ token, site, products }) => {
+    async ({ site, products }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
-        // Bulk create products
-        const createdProducts = await client.api.v1SiteProductsBulkCreate({
+        // Validate products
+        const validationResults = await Promise.all(
+          products.map((product) =>
+            client.api.v1ValidateProductConfigCreate(product)
+          )
+        )
+
+        // Check for any validation errors
+        const allValidationErrors = validationResults.flatMap(
+          (result) => result.data || []
+        )
+
+        if (allValidationErrors.length > 0) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Validation errors: ${JSON.stringify(allValidationErrors, null, 2)}`,
+              },
+            ],
+            isError: true,
+          }
+        }
+
+        // If validation passes, upsert products
+        const upsertedProducts = await client.api.v1SiteProductsBulkCreate({
           bulk: products,
         })
-
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(createdProducts.data, null, 2),
+              text: JSON.stringify(upsertedProducts, null, 2),
             },
           ],
         }
@@ -136,7 +150,7 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
           content: [
             {
               type: "text",
-              text: `Error creating products: ${error instanceof Error ? error.message : String(error)}`,
+              text: `Error upserting products: ${error instanceof Error ? error.message : String(error)}`,
             },
           ],
           isError: true,
@@ -145,33 +159,55 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
     }
   )
 
-  // Tool to create/update multiple product groups
+  // Tool to bulk upsert product groups
   server.tool(
     "bulk_upsert_product_groups",
-      `* Creates or updates multiple "Product Groups" for the site in a single operation.
-* Product Groups are matched on "slug" - existing groups with matching slugs will be updated, new slugs will create new groups.
-* For each product group, the ENTIRE object needs to be included, even if only one field is being updated.
-* Required fields for each product group include: description, name, slug.
-* Optional fields can be omitted.`,
+    `* Creates or updates multiple product groups in bulk.
+* Provide an array of product groups to be created or updated.
+* Product groups are matched by their slug.
+* If a product group with the given slug exists, it will be updated; otherwise, a new product group will be created.`,
     {
-      token: z.string(),
       site: z.string(),
       product_groups: z.array(ProductGroupSchema),
     },
-    async ({ token, site, product_groups }) => {
+    async ({ site, product_groups }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
-        // Bulk create product groups
-        const createdGroups = await client.api.v1SiteProductGroupsBulkCreate({
-          bulk: product_groups,
-        })
+        // Validate product groups
+        const validationResults = await Promise.all(
+          product_groups.map((group) =>
+            client.api.v1ValidateProductGroupCreate(group)
+          )
+        )
 
+        // Check for any validation errors
+        const allValidationErrors = validationResults.flatMap(
+          (result) => result.data || []
+        )
+
+        if (allValidationErrors.length > 0) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Validation errors: ${JSON.stringify(allValidationErrors, null, 2)}`,
+              },
+            ],
+            isError: true,
+          }
+        }
+
+        // If validation passes, upsert product groups
+        const upsertedProductGroups =
+          await client.api.v1SiteProductGroupsBulkCreate({
+            bulk: product_groups,
+          })
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(createdGroups.data, null, 2),
+              text: JSON.stringify(upsertedProductGroups, null, 2),
             },
           ],
         }
@@ -180,7 +216,7 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
           content: [
             {
               type: "text",
-              text: `Error creating product groups: ${JSON.stringify(error)}`,
+              text: `Error upserting product groups: ${error instanceof Error ? error.message : String(error)}`,
             },
           ],
           isError: true,
@@ -189,27 +225,24 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
     }
   )
 
-  // Tool to delete a single product
+  // Tool to delete a product
   server.tool(
     "delete_product",
-      `* Deletes a "Product" from the site.
-* This cannot be undone so make sure it is the right slug.`,
+    `* Deletes a specific product by its slug.
+* Provide the site and the product slug to be deleted.`,
     {
-      token: z.string(),
       site: z.string(),
       product_slug: z.string(),
     },
-    async ({ token, site, product_slug }) => {
+    async ({ site, product_slug }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
-
-        await client.api.v1SiteProductsDelete(product_slug)
-
+        const result = await client.api.v1SiteProductsDelete(product_slug)
         return {
           content: [
             {
               type: "text",
-              text: `Product with slug "${product_slug}" deleted successfully`,
+              text: JSON.stringify(result, null, 2),
             },
           ],
         }
@@ -227,27 +260,24 @@ export async function addProductsTools(server: McpServer, serverUrl: string) {
     }
   )
 
-  // Tool to delete a single product group
+  // Tool to delete a product group
   server.tool(
     "delete_product_group",
-      `* Deletes a "Product Group" from the site.
-* This cannot be undone so make sure it is the right slug.`,
+    `* Deletes a specific product group by its slug.
+* Provide the site and the product group slug to be deleted.`,
     {
-      token: z.string(),
       site: z.string(),
       group_slug: z.string(),
     },
-    async ({ token, site, group_slug }) => {
+    async ({ site, group_slug }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
-
-        await client.api.v1SiteProductGroupsDelete(group_slug)
-
+        const result = await client.api.v1SiteProductGroupsDelete(group_slug)
         return {
           content: [
             {
               type: "text",
-              text: `Product group with slug "${group_slug}" deleted successfully`,
+              text: JSON.stringify(result, null, 2),
             },
           ],
         }
