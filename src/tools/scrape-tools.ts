@@ -2,8 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z } from "zod"
 import { createLVAPIClient } from "./utils.js"
 import TurndownService from "turndown"
-import { parseDocument } from "htmlparser2"
-import { DomUtils } from "htmlparser2"
 
 export async function addScrapeTools(
   server: McpServer,
@@ -93,46 +91,10 @@ export async function addScrapeTools(
           }
         }
 
+        const { content, ...rest } = scrape.data
+
         const turndownService = new TurndownService()
-        const markdown = turndownService.turndown(scrape.data.content)
-
-        // Parse the HTML string
-        const document = parseDocument(scrape.data.content)
-
-        // Extract metadata
-        const metaTags = DomUtils.findAll(
-          (elem) =>
-            elem.name === "meta" &&
-            !!elem.attribs.name &&
-            !!elem.attribs.content,
-          document.children
-        )
-
-        const metadata: Record<string, string> = {}
-        metaTags.forEach((meta) => {
-          metadata[meta.attribs.name] = meta.attribs.content
-        })
-
-        // Extract ld+json schema
-        const scriptTags = DomUtils.findAll(
-          (elem) =>
-            elem.name === "script" &&
-            elem.attribs.type === "application/ld+json",
-          document.children
-        )
-
-        const ldJsonSchemas: any[] = []
-        scriptTags.forEach((script) => {
-          const textNode = script.children.find(DomUtils.isText)
-          if (textNode && DomUtils.isText(textNode)) {
-            try {
-              ldJsonSchemas.push(JSON.parse(textNode.data))
-            } catch (error) {
-              // console.error("Error parsing ld+json:", error)
-              ldJsonSchemas.push(textNode.data)
-            }
-          }
-        })
+        const markdown = turndownService.turndown(content)
 
         return {
           content: [
@@ -140,13 +102,7 @@ export async function addScrapeTools(
               type: "text",
               text: JSON.stringify({
                 markdown,
-                ldJsonSchemas,
-                metadata,
-                images: scrape.data.images,
-                url: scrape.data.url,
-                name: scrape.data.site_name,
-                title: scrape.data.title,
-                description: scrape.data.description,
+                ...rest,
               }),
             },
           ],
