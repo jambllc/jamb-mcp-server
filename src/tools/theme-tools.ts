@@ -69,30 +69,13 @@ export async function addThemeTools(
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
-        // First validate the theme data
-        const validationResult = await client.api.v1ValidateThemeCreate(theme)
-
-        // Check if validation result contains any errors
-        const validationErrors = validationResult.data || []
-        if (validationErrors.length > 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Validation errors: ${JSON.stringify(validationErrors, null, 2)}`,
-              },
-            ],
-            isError: true,
-          }
-        }
-
         // If validation passes, update the theme
         const updatedTheme = await client.api.v1SiteThemeCreate(theme)
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(updatedTheme, null, 2),
+              text: JSON.stringify(updatedTheme.data, null, 2),
             },
           ],
         }

@@ -513,6 +513,86 @@ export interface LVFooter {
   mapType?: string | null
 }
 
+/** Form */
+export interface LVForm {
+  /**
+   * Fields
+   * List of field types to include in the contact form, such as ['name', 'email', 'phone', 'service', 'location', 'message', 'address', 'text', 'select', 'multiselect'].
+   */
+  fields: LVFormField[]
+  /**
+   * Header
+   * Header of the form. If not set a default header will be used.
+   * @default null
+   */
+  header?: string | null
+  /**
+   * Page
+   * Indicates whether the form has a page or is a popup.
+   * @default false
+   */
+  page?: boolean | null
+  /**
+   * Text
+   * Introductory text displayed above the contact form, explaining its purpose to users.
+   * @default null
+   */
+  text?: string | null
+  /**
+   * Type
+   * The 'name' of the form and also splat.
+   */
+  type: string
+}
+
+/** FormField */
+export interface LVFormField {
+  /**
+   * Label
+   * Label of the field. Optional, but should be set for generic types like 'text', 'select', etc.
+   * @default null
+   */
+  label?: string | null
+  /**
+   * Options
+   * Value options for 'select' and 'multiselect' field types.
+   * @default null
+   */
+  options?: string[] | null
+  /**
+   * Placeholder
+   * Placeholder text for the field, providing a hint to the user about what to enter.
+   * @default null
+   */
+  placeholder?: string | null
+  /**
+   * Required
+   * Indicates whether the field is required to submit the form.
+   */
+  required: boolean
+  /**
+   * Sensitive
+   * Indicates whether the rare circumstances contains sensitive information; will not store any values in our system if this is set. Default is False.
+   * @default false
+   */
+  sensitive?: boolean
+  /**
+   * Type
+   * Type of the field, such as 'name', 'email', 'phone', 'service', 'location', 'message', 'address', 'text', 'select', or 'multiselect'.
+   */
+  type: string
+}
+
+/** Forms */
+export interface LVForms {
+  /**
+   * Forms
+   * List of forms.
+   * @default null
+   */
+  forms?: LVForm[]
+}
+
 /** GeoLocation */
 export interface LVGeoLocation {
   /**
@@ -942,7 +1022,7 @@ export interface LVLocation {
   measureArea?: string[] | null
   /**
    * Name
-   * This is the name of the location and the slug of the location page. This should be the official name of the city if there is only one location in the city. If there are multiple locations in the same city, this should include the city name and the location name, such as 'Austin - Downtown' or 'Austin - South Lamar'.
+   * This is the name of the location and the slug of the location page. This should be the official name of the city if there is only one location in the city. If there are multiple locations in the same city, this should include the city name and the neighborhood or area of the location, such as 'Austin - Downtown' or 'Austin - South Lamar'
    */
   name: string
   /**
@@ -1479,6 +1559,45 @@ export interface LVSalary {
   type: string
 }
 
+/**
+ * ScrapeDataFile
+ * Data model for scrape files
+ */
+export interface LVScrapeDataFile {
+  /** Content */
+  content: string
+  /** Description */
+  description: string
+  /** Images */
+  images: LVScrapeImage[]
+  /** Site Name */
+  site_name: string
+  /** Title */
+  title: string
+  /** Url */
+  url: string
+}
+
+/**
+ * ScrapeDataFileNames
+ * Data model for scrape files
+ */
+export interface LVScrapeDataFileNames {
+  /** Filename */
+  filename: string
+}
+
+/**
+ * ScrapeImage
+ * Data model for scrape images
+ */
+export interface LVScrapeImage {
+  /** Alt */
+  alt: string
+  /** Url */
+  url: string
+}
+
 /** SectionConfig */
 export interface LVSectionConfig {
   /**
@@ -1578,6 +1697,8 @@ export interface LVSiteData {
    * @default null
    */
   faq?: LVFAQItem[] | null
+  /** @default null */
+  forms?: LVForms | null
   /**
    * Jobs
    * @default null
@@ -1607,6 +1728,8 @@ export interface LVSiteVersionInput {
    * @default null
    */
   faq?: LVFAQItem[] | null
+  /** @default null */
+  forms?: LVForms | null
   /**
    * Jobs
    * @default null
@@ -2388,14 +2511,14 @@ export class LVAPI<SecurityDataType extends unknown> {
 
   api = {
     /**
-         * No description
-         *
-         * @tags account
-         * @name V1AcccountCreate
-         * @summary
-         Create a new account
-         * @request POST:/api/v1/acccount
-         */
+ * No description
+ *
+ * @tags account
+ * @name V1AcccountCreate
+ * @summary 
+    Create a new account
+ * @request POST:/api/v1/acccount
+ */
     v1AcccountCreate: (data: LVAccountData, params: RequestParams = {}) =>
       this.http.request<LVAccountData, any>({
         path: `/api/v1/acccount`,
@@ -2407,14 +2530,14 @@ export class LVAPI<SecurityDataType extends unknown> {
       }),
 
     /**
-         * No description
-         *
-         * @tags dfseo
-         * @name V1DfseoBusinessInfoRequestDetail
-         * @summary
-         Get business info request for a place_id
-         * @request GET:/api/v1/dfseo/business_info/request/{place_id}
-         */
+ * No description
+ *
+ * @tags dfseo
+ * @name V1DfseoBusinessInfoRequestDetail
+ * @summary 
+    Get business info request for a place_id
+ * @request GET:/api/v1/dfseo/business_info/request/{place_id}
+ */
     v1DfseoBusinessInfoRequestDetail: (
       placeId: string,
       params: RequestParams = {}
@@ -2427,14 +2550,14 @@ export class LVAPI<SecurityDataType extends unknown> {
       }),
 
     /**
-         * No description
-         *
-         * @tags dfseo
-         * @name V1DfseoBusinessInfoTaskDetail
-         * @summary
-         Get task status for a task_id
-         * @request GET:/api/v1/dfseo/business_info/task/{task_id}
-         */
+ * No description
+ *
+ * @tags dfseo
+ * @name V1DfseoBusinessInfoTaskDetail
+ * @summary 
+    Get task status for a task_id
+ * @request GET:/api/v1/dfseo/business_info/task/{task_id}
+ */
     v1DfseoBusinessInfoTaskDetail: (
       taskId: string,
       params: RequestParams = {}
@@ -2447,14 +2570,14 @@ export class LVAPI<SecurityDataType extends unknown> {
       }),
 
     /**
-         * No description
-         *
-         * @tags google
-         * @name V1GoogleAutocompleteList
-         * @summary
-         Get business info request for a place_id
-         * @request GET:/api/v1/google/autocomplete
-         */
+ * No description
+ *
+ * @tags google
+ * @name V1GoogleAutocompleteList
+ * @summary 
+    Get business info request for a place_id
+ * @request GET:/api/v1/google/autocomplete
+ */
     v1GoogleAutocompleteList: (
       query: {
         input: string
@@ -2470,14 +2593,14 @@ export class LVAPI<SecurityDataType extends unknown> {
       }),
 
     /**
-         * No description
-         *
-         * @tags google
-         * @name V1GooglePlaceDetailsDetail
-         * @summary
-         Get task status for a task_id
-         * @request GET:/api/v1/google/place_details/{place_id}
-         */
+ * No description
+ *
+ * @tags google
+ * @name V1GooglePlaceDetailsDetail
+ * @summary 
+    Get task status for a task_id
+ * @request GET:/api/v1/google/place_details/{place_id}
+ */
     v1GooglePlaceDetailsDetail: (placeId: string, params: RequestParams = {}) =>
       this.http.request<LVPlaceDetailsResult, any>({
         path: `/api/v1/google/place_details/${placeId}`,
@@ -2503,6 +2626,40 @@ export class LVAPI<SecurityDataType extends unknown> {
         path: `/api/v1/health`,
         method: "GET",
         query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+ * No description
+ *
+ * @tags account
+ * @name V1ScrapeList
+ * @summary 
+    List scraped files
+ * @request GET:/api/v1/scrape
+ */
+    v1ScrapeList: (params: RequestParams = {}) =>
+      this.http.request<LVScrapeDataFileNames[], any>({
+        path: `/api/v1/scrape`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+ * No description
+ *
+ * @tags scrape
+ * @name V1ScrapeDetail
+ * @summary 
+    Get scraped file
+ * @request GET:/api/v1/scrape/{filename}
+ */
+    v1ScrapeDetail: (filename: string, params: RequestParams = {}) =>
+      this.http.request<LVScrapeDataFile, any>({
+        path: `/api/v1/scrape/${filename}`,
+        method: "GET",
         format: "json",
         ...params,
       }),
@@ -2609,6 +2766,75 @@ export class LVAPI<SecurityDataType extends unknown> {
     ) =>
       this.http.request<LVFAQItem, any>({
         path: `/api/v1/site/faqs/${faqId}`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsList
+     * @summary Get the forms of the currently authenticated site
+     * @request GET:/api/v1/site/forms
+     */
+    v1SiteFormsList: (params: RequestParams = {}) =>
+      this.http.request<LVForms, any>({
+        path: `/api/v1/site/forms`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsDelete
+     * @summary Delete a form by type
+     * @request DELETE:/api/v1/site/forms/{form_type}
+     */
+    v1SiteFormsDelete: (formType: string, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/v1/site/forms/${formType}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsDetail
+     * @summary Get a specific form by type
+     * @request GET:/api/v1/site/forms/{form_type}
+     */
+    v1SiteFormsDetail: (formType: string, params: RequestParams = {}) =>
+      this.http.request<LVForm, any>({
+        path: `/api/v1/site/forms/${formType}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsCreate
+     * @summary Create or update a form
+     * @request POST:/api/v1/site/forms/{form_type}
+     */
+    v1SiteFormsCreate: (
+      formType: string,
+      data: LVForm,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVForm, any>({
+        path: `/api/v1/site/forms/${formType}`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -2860,6 +3086,22 @@ export class LVAPI<SecurityDataType extends unknown> {
      * No description
      *
      * @tags site
+     * @name V1SiteRevertDetail
+     * @summary Revert site version to {version_number} deleting all version higher, this is irreversible so be careful
+     * @request GET:/api/v1/site/revert/{version_number}
+     */
+    v1SiteRevertDetail: (versionNumber: string, params: RequestParams = {}) =>
+      this.http.request<LVSiteData, any>({
+        path: `/api/v1/site/revert/${versionNumber}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
      * @name V1SiteThemeList
      * @summary Get the theme configuration for the current site
      * @request GET:/api/v1/site/theme
@@ -3015,69 +3257,6 @@ export class LVAPI<SecurityDataType extends unknown> {
      * No description
      *
      * @tags validate
-     * @name V1ValidateBusinessCreate
-     * @summary Get the profile of the currently authenticated user
-     * @request POST:/api/v1/validate/business
-     */
-    v1ValidateBusinessCreate: (
-      data: LVValidationInput,
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/business`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
-     * @name V1ValidateFaqCreate
-     * @summary Validate an FAQ against the Faq model
-     * @request POST:/api/v1/validate/faq
-     */
-    v1ValidateFaqCreate: (
-      data: LVValidationInput,
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/faq`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
-     * @name V1ValidateJobPostingCreate
-     * @summary Validate a job posting against the JobPosting model
-     * @request POST:/api/v1/validate/job-posting
-     */
-    v1ValidateJobPostingCreate: (
-      data: LVValidationInput,
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/job-posting`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
      * @name V1ValidateProductGroupCreate
      * @summary Validate a product group against the ProductGroup model
      * @request POST:/api/v1/validate/product-group
@@ -3099,27 +3278,6 @@ export class LVAPI<SecurityDataType extends unknown> {
      * No description
      *
      * @tags validate
-     * @name V1ValidateProductGroupsBulkCreate
-     * @summary Validate multiple product groups against the ProductGroup model
-     * @request POST:/api/v1/validate/product-groups/bulk
-     */
-    v1ValidateProductGroupsBulkCreate: (
-      data: LVProductGroupBulkImport,
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/product-groups/bulk`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
      * @name V1ValidateProductConfigCreate
      * @summary Validate a product against the Product model
      * @request POST:/api/v1/validate/productConfig
@@ -3130,70 +3288,6 @@ export class LVAPI<SecurityDataType extends unknown> {
     ) =>
       this.http.request<LVValidationErrorData[], any>({
         path: `/api/v1/validate/productConfig`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
-     * @name V1ValidateProductsBulkCreate
-     * @summary Validate multiple products against the Product model
-     * @request POST:/api/v1/validate/products/bulk
-     */
-    v1ValidateProductsBulkCreate: (
-      query: {
-        body: string
-      },
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/products/bulk`,
-        method: "POST",
-        query: query,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
-     * @name V1ValidateThemeCreate
-     * @summary Validate theme configuration against the Theme model
-     * @request POST:/api/v1/validate/theme
-     */
-    v1ValidateThemeCreate: (
-      data: LVValidationInput,
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/theme`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags validate
-     * @name V1ValidateWebsiteConfigCreate
-     * @summary Validate website configuration against the WebsiteConfig model
-     * @request POST:/api/v1/validate/website-config
-     */
-    v1ValidateWebsiteConfigCreate: (
-      data: LVValidationInput,
-      params: RequestParams = {}
-    ) =>
-      this.http.request<LVValidationErrorData[], any>({
-        path: `/api/v1/validate/website-config`,
         method: "POST",
         body: data,
         type: ContentType.Json,

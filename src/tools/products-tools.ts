@@ -42,7 +42,7 @@ export async function addProductsTools(
           content: [
             {
               type: "text",
-              text: JSON.stringify(products, null, 2),
+              text: JSON.stringify(products.data, null, 2),
             },
           ],
         }
@@ -76,7 +76,7 @@ export async function addProductsTools(
           content: [
             {
               type: "text",
-              text: JSON.stringify(productGroups, null, 2),
+              text: JSON.stringify(productGroups.data, null, 2),
             },
           ],
         }
@@ -108,30 +108,6 @@ export async function addProductsTools(
     async ({ site, products }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
-
-        // Validate products
-        const validationResults = await Promise.all(
-          products.map((product) =>
-            client.api.v1ValidateProductConfigCreate(product)
-          )
-        )
-
-        // Check for any validation errors
-        const allValidationErrors = validationResults.flatMap(
-          (result) => result.data || []
-        )
-
-        if (allValidationErrors.length > 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Validation errors: ${JSON.stringify(allValidationErrors, null, 2)}`,
-              },
-            ],
-            isError: true,
-          }
-        }
 
         // If validation passes, upsert products
         const upsertedProducts = await client.api.v1SiteProductsBulkCreate({

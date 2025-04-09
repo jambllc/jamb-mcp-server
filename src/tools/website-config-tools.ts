@@ -37,7 +37,7 @@ export async function addWebsiteConfigTools(
           content: [
             {
               type: "text",
-              text: JSON.stringify(websiteConfig, null, 2),
+              text: JSON.stringify(websiteConfig.data, null, 2),
             },
           ],
         }
@@ -69,24 +69,6 @@ export async function addWebsiteConfigTools(
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
-        // First validate the website config data
-        const validationResult =
-          await client.api.v1ValidateWebsiteConfigCreate(website_config)
-
-        // Check if validation result contains any errors
-        const validationErrors = validationResult.data || []
-        if (validationErrors.length > 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Validation errors: ${JSON.stringify(validationErrors, null, 2)}`,
-              },
-            ],
-            isError: true,
-          }
-        }
-
         // If validation passes, update the website config
         const updatedWebsiteConfig =
           await client.api.v1SiteWebsiteConfigCreate(website_config)
@@ -94,7 +76,7 @@ export async function addWebsiteConfigTools(
           content: [
             {
               type: "text",
-              text: JSON.stringify(updatedWebsiteConfig, null, 2),
+              text: JSON.stringify(updatedWebsiteConfig.data, null, 2),
             },
           ],
         }

@@ -37,7 +37,7 @@ export async function addBusinessTools(
           content: [
             {
               type: "text",
-              text: JSON.stringify(business, null, 2),
+              text: JSON.stringify(business.data, null, 2),
             },
           ],
         }
@@ -70,31 +70,13 @@ export async function addBusinessTools(
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
 
-        // First validate the business data
-        const validationResult =
-          await client.api.v1ValidateBusinessCreate(business)
-
-        // Check if validation result contains any errors
-        const validationErrors = validationResult.data || []
-        if (validationErrors.length > 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Validation errors: ${JSON.stringify(validationErrors, null, 2)}`,
-              },
-            ],
-            isError: true,
-          }
-        }
-
         // If validation passes, update the business
         const updatedBusiness = await client.api.v1SiteBusinessCreate(business)
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(updatedBusiness, null, 2),
+              text: JSON.stringify(updatedBusiness.data, null, 2),
             },
           ],
         }

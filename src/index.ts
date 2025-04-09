@@ -9,6 +9,8 @@ import * as process from "process"
 import { addWebsiteConfigTools } from "./tools/website-config-tools.js"
 import { addThemeTools } from "./tools/theme-tools.js"
 import { addProductsTools } from "./tools/products-tools.js"
+import { addNewSitePrompts } from "./prompts/new-site.js"
+import { addScrapeTools } from "./tools/scrape-tools.js"
 
 // Parse command-line arguments
 const parseArgs = () => {
@@ -96,6 +98,8 @@ async function main() {
   await addWebsiteConfigTools(server, SERVER_URL, TOKEN)
   await addThemeTools(server, SERVER_URL, TOKEN)
   await addProductsTools(server, SERVER_URL, TOKEN)
+  await addNewSitePrompts(server, SERVER_URL)
+  await addScrapeTools(server, SERVER_URL, TOKEN)
 
   const transport =
     process.env.TRANSPORT === "http"
