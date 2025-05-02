@@ -57,7 +57,7 @@ export async function addFeedbackTools(
           content: [
             {
               type: "text",
-              text: `Error listing feedback: ${error instanceof Error ? error.message : String(error)}`,
+              text: `Error listing feedback: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
             },
           ],
           isError: true,
@@ -184,7 +184,7 @@ export async function addFeedbackTools(
           }
         }
 
-        for (const key of Object.keys(feedback)) {
+        for (const key of Object.keys(feedbackData)) {
           if (!key.endsWith("Ref")) {
             return {
               content: [
