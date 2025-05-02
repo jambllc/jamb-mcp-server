@@ -55,15 +55,15 @@ export async function addScrapeTools(
         .describe(
           "The filename of the scrape to retrieve (from scrape_page_list)"
         ),
-      raw: z
+      markdown: z
         .boolean()
         .optional()
         .default(false)
         .describe(
-          "Whether to return the raw content or parsed content. Raw html can be very large but use if looking for something you cannot find anywhere else."
+          "Whether to return the raw content or markdown content. Markdown can help if documents are too large, but can miss styling and images you might want to look for."
         ),
     },
-    async ({ site, filename, raw }) => {
+    async ({ site, filename, markdown }) => {
       try {
         const client = createLVAPIClient(serverUrl, { token, site })
         const scrape = await client.api.v1ScrapeDetail(filename)
@@ -80,7 +80,7 @@ export async function addScrapeTools(
           }
         }
 
-        if (raw) {
+        if (!markdown) {
           return {
             content: [
               {
@@ -94,14 +94,14 @@ export async function addScrapeTools(
         const { content, ...rest } = scrape.data
 
         const turndownService = new TurndownService()
-        const markdown = turndownService.turndown(content)
+        const markdownText = turndownService.turndown(content || "")
 
         return {
           content: [
             {
               type: "text",
               text: JSON.stringify({
-                markdown,
+                markdown: markdownText,
                 ...rest,
               }),
             },

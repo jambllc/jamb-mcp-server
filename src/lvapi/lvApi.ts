@@ -14,12 +14,12 @@
 export interface LVAbout {
   /**
    * Description
-   * Detailed information about the business, its history, values, approach, and other relevant background information. Often stored in a markdown file.
+   * [Markdown] Detailed information about the business, its history, values, approach, and other relevant background information. Often stored in a markdown file.
    */
   description: string
   /**
    * Image
-   * Main image used in the about section, typically a photo of the business owner, team, or location.
+   * [Image] Main image used in the about section, typically a photo of the business owner, team, or location.
    * @default null
    */
   image?: string | null
@@ -93,6 +93,16 @@ export interface LVAddress {
    * Street address including house/building number and street name, such as '123 Main Street'.
    */
   streetAddress: string
+}
+
+/** AddressComponentData */
+export interface LVAddressComponentData {
+  /** Long Name */
+  long_name: string
+  /** Short Name */
+  short_name: string
+  /** Types */
+  types: string[]
 }
 
 /**
@@ -209,12 +219,12 @@ export interface LVBusiness {
   hours: LVHours[]
   /**
    * Intro
-   * Introduction text for the homepage hero section, often formatted in markdown with headings and emphasis. Should be formatted in markdown, must contain an h1 heading, can contain h2 subheading and/or normal text. It should be short and hit the main value of the business.
+   * [Markdown] Introduction text for the homepage hero section, often formatted in markdown with headings and emphasis. Should be formatted in markdown, must contain an h1 heading, can contain h2 subheading and/or normal text. It should be short and hit the main value of the business.
    */
   intro: string
   /**
    * Introimage
-   * Hero image displayed on the homepage, typically a representative photo of the business, services, or location.
+   * [Image] Hero image displayed on the homepage, typically a representative photo of the business, services, or location.
    * @default null
    */
   introImage?: string | null
@@ -231,7 +241,7 @@ export interface LVBusiness {
   locations: LVLocation[]
   /**
    * Logo
-   * Business logo image file name, used in the header, footer, and for branding throughout the site.
+   * [Image] Business logo image file name, used in the header, footer, and for branding throughout the site.
    * @default null
    */
   logo?: string | null
@@ -250,11 +260,15 @@ export interface LVBusiness {
   phoneNumber?: string | null
   /**
    * Productgroups
+   * Deprecated. Use products object
+   * @deprecated
    * @default null
    */
   productGroups?: LVProductGroup[] | null
   /**
    * Products
+   * Deprecated. Use products object
+   * @deprecated
    * @default null
    */
   products?: LVProduct[] | null
@@ -355,13 +369,13 @@ export interface LV_CTA {
 export interface LVCTAConfig {
   /**
    * Href
-   * Internal URL or anchor link for navigation within the website, such as '#contact' or '#subscribe'.
+   * [Only use when overriding default] clickable href for the CTA.
    * @default null
    */
   href?: string | null
   /**
    * Icon
-   * Icon identifier to display with the CTA, should be a value from phosphoricon using the format 'phosphoricon:regular:calendar'.
+   * [Optional] Icon identifier to display with the CTA, should be a value from phosphoricon using the format 'Calendar'. This list of icons that can be used are the following: FacebookLogo, LinkedinLogo, TwitterLogo, YoutubeLogo, InstagramLogo, GoogleLogo, CheckCircle, Certificate, Medal, Sparkle, GraduationCap, MedalStar, ChatCenteredText, Hamburger, BeerStein, Lightbulb, ClipboardText, Calculator, CallBell, PhoneCall, EnvelopeSimple, Question, CursorClick, Star, Calendar, CalendarStar, User, Users, MapPin, NavigationArrow, ArrowCircleRight, ArrowSquareOut, Check, Clock, ClockCounterClockwise, Lifebuoy, Gift, CaretRight, CaretLeft, CaretUp, CaretDown, X, HambugerMenu, ChatCircle, PencilLine, Clipboard, Hammer, CheckSquare, Handshake, CalendarCheck, SortAscending, Tag, MegaphoneSimple, ShoppingCart, CurrencyDollar, Heart, Shield, HandsPraying, Tree, Tractor, HardHat, Panorama.
    * @default null
    */
   icon?: string | null
@@ -378,7 +392,7 @@ export interface LVCTAConfig {
   name: string
   /**
    * Text
-   * Display text for the call-to-action button, shown to users.
+   * [Optional] Display text for the call-to-action button, shown to users. There is always a default that should be used in most cases, this should rarely be set.
    * @default null
    */
   text?: string | null
@@ -405,7 +419,7 @@ export interface LVConfigKeys {
   key: string
   /**
    * Type
-   * Type of integration or tracking service, such as 'googleAds'.
+   * Integration configurations for third-party services like analytics and tracking.
    */
   type: string
 }
@@ -473,11 +487,33 @@ export interface LVEstablishment {
   place_id: string
 }
 
+/** EventStorySchedule */
+export interface LVEventStorySchedule {
+  /**
+   * Date
+   * Date and time of the event.
+   * @format date-time
+   */
+  date: string
+  /**
+   * End
+   * End of the event. Null if end of day or all 24 hours. Must be in the format HH:mm.
+   * @default null
+   */
+  end?: string | null
+  /**
+   * Start
+   * Start of the event. Null if start of day or all 24 hours. Must be in the format HH:mm.
+   * @default null
+   */
+  start?: string | null
+}
+
 /** FAQItem */
 export interface LVFAQItem {
   /**
    * Answer
-   * The answer text to the question, providing helpful information to address the inquiry. Can include markdown formatting but have no headings higher than h2.
+   * [Markdown] The answer text to the question, providing helpful information to address the inquiry. Can include markdown formatting but have no headings higher than h2.
    */
   answer: string
   /**
@@ -487,7 +523,7 @@ export interface LVFAQItem {
   id: string
   /**
    * Question
-   * The question text displayed to users, written in a clear, concise manner addressing common customer inquiries.
+   * [Markdown] The question text displayed to users, written in a clear, concise manner addressing common customer inquiries.
    */
   question: string
   /**
@@ -498,6 +534,112 @@ export interface LVFAQItem {
   serviceRef?: string[] | null
 }
 
+/** FeedbackItem */
+export interface LVFeedbackItem {
+  /**
+   * Author
+   * Name of the author.
+   */
+  author: string
+  /**
+   * Authorimage
+   * [Image] URL of the author's image.
+   * @default null
+   */
+  authorImage?: string | null
+  /**
+   * Externalid
+   * External system identifier for the feedback.
+   * @default null
+   */
+  externalId?: string | null
+  /**
+   * Externalurl
+   * URL to the external feedback source.
+   * @default null
+   */
+  externalUrl?: string | null
+  /**
+   * Id
+   * Local Unique identifier for feedback.
+   * @default null
+   */
+  id?: string | null
+  /**
+   * Image
+   * [Image] URL of an image associated with the feedback.
+   * @default null
+   */
+  image?: string | null
+  /**
+   * Images
+   * [Image] List of URLs of associated images.
+   * @default null
+   */
+  images?: string[] | null
+  /**
+   * Locationref
+   * References to the related locations (location ids).
+   * @default null
+   */
+  locationRef?: string[] | null
+  /**
+   * Postedat
+   * Date and time when the feedback was posted.
+   * @default null
+   */
+  postedAt?: string | null
+  /**
+   * Productref
+   * References to the related products (product slugs).
+   * @default null
+   */
+  productRef?: string[] | null
+  /**
+   * Rating
+   * Rating provided in the feedback.
+   * @default null
+   */
+  rating?: number | null
+  /**
+   * Responsepostedat
+   * Date and time when the response was posted.
+   * @default null
+   */
+  responsePostedAt?: string | null
+  /**
+   * Responsetext
+   * Response text provided to the feedback.
+   * @default null
+   */
+  responseText?: string | null
+  /**
+   * Serviceref
+   * References to the related services (service ids).
+   * @default null
+   */
+  serviceRef?: string[] | null
+  /**
+   * Source
+   * Source of the feedback, e.g., manual or external system.
+   * @default "manual"
+   */
+  source?: string
+  /**
+   * Text
+   * Main text content of the feedback.
+   */
+  text: string
+}
+
+/** FeedbackListResponse */
+export interface LVFeedbackListResponse {
+  /** Items */
+  items: LVFeedbackItem[]
+  /** Total */
+  total: number
+}
+
 /** Footer */
 export interface LVFooter {
   /**
@@ -505,6 +647,12 @@ export interface LVFooter {
    * List of call-to-action identifiers to display as floating buttons in the footer, such as ['contact', 'phone']. There should be no more than 3 floating CTAs, and most businesses should only have 1 or 2.
    */
   floaterCTAs: string[]
+  /**
+   * Footerctas
+   * If not set, phone & email will be shown on footer. If you want others or more, have a list of them here. But if you define this here include phone and email if you want them.
+   * @default null
+   */
+  footerCTAs?: string[] | null
   /**
    * Maptype
    * Type of map to display in the footer, such as 'google' or 'bing'.
@@ -534,7 +682,7 @@ export interface LVForm {
   page?: boolean | null
   /**
    * Text
-   * Introductory text displayed above the contact form, explaining its purpose to users.
+   * [Markdown] Introductory text displayed above the contact form, explaining its purpose to users.
    * @default null
    */
   text?: string | null
@@ -545,6 +693,50 @@ export interface LVForm {
   type: string
 }
 
+/** FormData */
+export interface LVFormData {
+  /** Data */
+  data: Record<string, string>
+  /**
+   * Id
+   * Unique ID for the form data
+   * @default null
+   */
+  id?: string | null
+  /**
+   * Type
+   * Type of the form
+   */
+  type: string
+}
+
+/** FormDataInput */
+export interface LVFormDataInput {
+  /** Data */
+  data: Record<string, string>
+  /**
+   * Id
+   * Unique ID for the form data
+   * @default null
+   */
+  id?: string | null
+  /**
+   * Ip
+   * IP address of the form submission
+   */
+  ip: string
+  /**
+   * Type
+   * Type of the form
+   */
+  type: string
+  /**
+   * Useragent
+   * User agent of the form submission
+   */
+  userAgent: string
+}
+
 /** FormField */
 export interface LVFormField {
   /**
@@ -553,6 +745,12 @@ export interface LVFormField {
    * @default null
    */
   label?: string | null
+  /**
+   * Mask
+   * Mask for text field. #-number, $-letter
+   * @default null
+   */
+  mask?: string | null
   /**
    * Options
    * Value options for 'select' and 'multiselect' field types.
@@ -568,17 +766,24 @@ export interface LVFormField {
   /**
    * Required
    * Indicates whether the field is required to submit the form.
+   * @default null
    */
-  required: boolean
+  required?: boolean | null
   /**
    * Sensitive
    * Indicates whether the rare circumstances contains sensitive information; will not store any values in our system if this is set. Default is False.
-   * @default false
+   * @default null
    */
-  sensitive?: boolean
+  sensitive?: boolean | null
+  /**
+   * Sublabel
+   * Sub-label of the field. Rarely used but use if more information is needed.
+   * @default null
+   */
+  subLabel?: string | null
   /**
    * Type
-   * Type of the field, such as 'name', 'email', 'phone', 'service', 'location', 'message', 'address', 'text', 'select', or 'multiselect'.
+   * Type of the field: 'name' (first + last), 'email', 'phone', 'date', 'service' (linked to services), 'location' (business locations), 'message' (multi-line text field), 'address' (address, autocompletes), 'text' (simple text field), 'select' (simple select w options), or 'multiselect' (select from multiple optons).
    */
   type: string
 }
@@ -590,7 +795,7 @@ export interface LVForms {
    * List of forms.
    * @default null
    */
-  forms?: LVForm[]
+  forms?: LVForm[] | null
 }
 
 /** GeoLocation */
@@ -900,7 +1105,7 @@ export interface LVHours {
 export interface LVJobPosting {
   /**
    * Companydescription
-   * Brief description of the company offering the job, highlighting key aspects relevant to job seekers.
+   * [Markdown] Brief description of the company offering the job, highlighting key aspects relevant to job seekers.
    */
   companyDescription: string
   /**
@@ -939,7 +1144,7 @@ export interface LVJobPosting {
   id: string
   /**
    * Jobdescription
-   * Detailed description of the job responsibilities, expectations, and role details, often in markdown format.
+   * [Markdown] Detailed description of the job responsibilities, expectations, and role details, often in markdown format.
    */
   jobDescription: string
   /**
@@ -969,6 +1174,27 @@ export interface LVJobPosting {
    * Job title or position name, describing the role being advertised.
    */
   title: string
+}
+
+/** LLMImproveTextInput */
+export interface LVLLMImproveTextInput {
+  /** Fielddescription */
+  fieldDescription: string
+  /** Improvement */
+  improvement: string
+  /** Markdown */
+  markdown: string
+}
+
+/** LLMImproveTextOutput */
+export interface LVLLMImproveTextOutput {
+  /** Markdown */
+  markdown: string
+  /**
+   * Text
+   * @default null
+   */
+  text?: string | null
 }
 
 /** Location */
@@ -1005,7 +1231,7 @@ export interface LVLocation {
   id: string
   /**
    * Locationdescription
-   * Detailed description of the location including nearby landmarks, accessibility information, and area details.
+   * [Markdown] Detailed description of the location including nearby landmarks, accessibility information, and area details.
    */
   locationDescription: string
   /**
@@ -1014,6 +1240,12 @@ export interface LVLocation {
    * @default null
    */
   locationMentions?: string[] | null
+  /**
+   * Managedbygoogle
+   * Whether to manage from Google, this will make all fields that can be set by a google place automatically updates. No effect if no googlePlaceId
+   * @default null
+   */
+  managedByGoogle?: boolean | null
   /**
    * Measurearea
    * List of zipcodes or postal codes in other countries to measure this location based on. SEO Searches will be done within these areas
@@ -1050,6 +1282,12 @@ export interface LVLocationData {
 /** NavigationItem */
 export interface LVNavigationItem {
   /**
+   * Highlight
+   * Whether to highlight this item in the navigation menu, defaults to false if not set. Never set for more than one item. Uses secondary color.
+   * @default null
+   */
+  highlight?: boolean | null
+  /**
    * Name
    * Internal identifier for the navigation item used for standard pages. A list of standard pages are 'Home' (always include), 'Services' (always include), 'About' (always include),  'Locations' (always include),'Stories', 'Events', 'Services', 'Gallery', 'FAQ', 'Menu' (always include for restaurant websites), 'Drinks', 'Food'. Do not include a contact page, as our footer has contact information across all pages. Where it's relevant a special page can be created from a story with a title and a relative url path. You can see an example of this on kateyvillalon's site with the IMAGO page.
    * @default null
@@ -1082,10 +1320,22 @@ export interface LVOpeningHoursData {
 /** PageConfig */
 export interface LVPageConfig {
   /**
+   * Description
+   * Description of the page, just text for SEO, not needed for some pages if they are not important for SEO
+   * @default null
+   */
+  description?: string | null
+  /**
    * Name
    * Identifier for the page type or template, such as 'Home', 'ServicePage', or 'About'.
    */
   name: string
+  /**
+   * Path
+   * Custom URL path for the page, only needed for custom page Names that doesn't have a known path
+   * @default null
+   */
+  path?: string | null
   /**
    * Sections
    * List of sections to be rendered on this page type, defining the page structure and content.
@@ -1111,6 +1361,7 @@ export interface LVPageConfig {
    *         - IntroHeroSplitImageRight: Split-screen hero with text left, image right. Good for balanced presentation of visual and textual content. Uses introImage and intro from business.json as it's hero image and intro text from business.json respectively, and can take in a cta for the primary call to action in the websiteConfig config definition.
    *         - IntroHeroImageTextBoxRight: Hero with floating text box over right side of image. Works well when text needs more emphasis over the image. Uses introImage and intro from business.json as it's hero image and intro text from business.json respectively, and can take in a cta for the primary call to action in the websiteConfig config definition.
    *         - GeneralHeroImageRight: Standard hero with image on right, text on left. Good for secondary pages where full-width/screen isn't needed. Requires a text and title, and can take in an image, cta for the primary call to action in the websiteConfig config definition.
+   *         - GeneralHeroImageTop: Standard hero with image on top, option to have text overlayed on image or the text on bottom. Good for secondary pages where the visual is important tot he value of the business. Requires a text and title, and can take in an image, cta for the primary call to action in the websiteConfig config definition. Also takes in a boolean of textOverlayed? which defaults to true.
    *         - IntroHeroWaveAnimationBG: This hero section is for websites that want to highlight their logo as the main hero and have multiple images that are representations of their work that can be rotated through in the background. Uses introImage and intro from business.json as it's hero image and intro text from business.json respectively, and the photos in images[] for the background rotating images, fullHeight=true if the images should take up the full height of the screen, and roundedBottom=false if the bottom should not be rounded styling wise in the websiteConfig config definition.
    *         - IntroHeroTextBoxRight: Hero with floating text box over right side of image. Works well when text needs more emphasis over the image. Uses introImage and intro from business.json as it's hero image and intro text from business.json respectively, and can take in a cta for the primary call to action and images[] for the background rotating images in the websiteConfig config definition.
    *         - IntroHeroRotatingBGImages: This hero section is for websites that want to highlight their logo as the main hero and have multiple images that are representations of their work that can be rotated through in the background. Uses introImage and intro from business.json as it's hero image and intro text from business.json respectively, and can take in a cta for the primary call to action, the photos in images[] for the background rotating images, fullHeight=true if the images should take up the full height of the screen, and roundedBottom=false if the bottom should not be rounded styling wise in the websiteConfig config definition.
@@ -1120,12 +1371,14 @@ export interface LVPageConfig {
    *         - RelatedBlogs: Shows cards of related blog posts. Use at bottom of blog posts or relevant service pages. Can be used on home pages that don't have a lot of content. Can take in a unique title in the websiteConfig config definition. Can be filtered to certain blogs by passing in tags in the websiteConfig config definition. Will show blogs related to the service on service pages.
    *         - FeedbackSimple: Clean, simple display of customer testimonials. Good for most pages where social proof is valuable. Can take in a unique title in the websiteConfig config definition. Will show Reviews related to the service on service pages, and related to the location on location pages.
    *         - FAQSection: FAQ section for the page, will show FAQs related to the service on service pages.  Can take in a unique title in the websiteConfig config definition.
-   *         - ProductList: This is a simple grid section that displays the products in the productsGroupIds[] array defined in the websiteConfig config definition. It will display the product name, description, and if a product has them, the featured image, price, variants and deitary attributes.
+   *         - ProductsList: This is a simple grid section that displays the products in the productsGroupIds[] array defined in the websiteConfig config definition. It will display the product name, description, and if a product has them, the featured image, price, variants and deitary attributes.
    *
    *         GALLERY SECTIONS:
    *         - BeforeAfterGallery: Interactive before/after image comparison. Perfect for renovation, restoration, or transformation services. Only use if buiness has specific and separate before and after images to showcase.
    *         - ImageGallery: Grid of images with lightbox viewing. Great for portfolios or showcasing work examples.  Can take in a unique title in the websiteConfig config definition.
-   *         - ProjectGallery: Project showcase with images and descriptions. Ideal for showcasing project work that includes multiple images, detailed case studies or portfolio items. Will show project galleries related to the service on service pages.
+   *         - AllProjectGalleriesDetails: This is a single page showing all projects with all associated images and descriptions. Ideal for showcasing project work that includes multiple images, detailed case studies or portfolio items for a business that has only 5 or less projects that each include not more than 10-15 images or no more than 40-50 images total.
+   *         - ProjectGalleryList: This is a list of project galleries that shows a list of projects with their headerImage, title, shortContent, addressString and postedAt if they exist and a link tot he SingleProjectGallery page for each project. This should be used for businesses that have more that 5 projects or any projects that have more than 10-15 images.
+   *         - SingleProjectGallery: This is a single page showing a single project with all associated images and descriptions. This takes in a storyID and is generally used automatically in conjuction with the ProjectGalleryList section. There is no need to include this section in the websiteConfig config definition.
    *         - HighlightGallery: This is a simple grid section that displays a highlight-gallery story type that shows off items with an image, title and description in a grid layout. It has the story title and description above the grid. Will show highlight galleries related to the service on service pages.
    *
    *
@@ -1136,18 +1389,19 @@ export interface LVPageConfig {
    *         CONTENT SECTIONS:
    *         - ImageLeftContentRightSection: Image on left with content on right. Good for breaking up long text with visuals. If paired with another split header or content section, alternate the image and content positions.  Requires a title and text and can take in a image for the background in the websiteConfig config definition.
    *         - ImageRightContentLeftSection: Content on left with image on right. Alternative to above for visual variety. If paired with another split header or content section, alternate the image and content positions. Requires a title and text and can take in a image for the background in the websiteConfig config definition.
-   *         - VisualListSection: List with icons or small images. Great for features, benefits, or process steps. This is good for a list of 2, 4, or 6 items to serve as mid-page visual breaks. Ensure that the list item titles are 1 or two words, the descriptions are short and concise and the icons are relevant to the list item and from phosphoricon. The list should be no more than 6 items. This Virtual List Section uses the primary color of the theme as the background color of the list items - so use this version of the list section when the primary color is a pleasing color to the eye and not too bright. Takes in a title, description, and items[] where each item needs a title, description and icon in the WebsiteConfig config section.
+   *         - VisualListSection: List with icons or small images. Great for features, benefits, or process steps. This is good for a list of 2, 4, or 6 items to serve as mid-page visual breaks. Ensure that the list item titles are 1 or two words, the descriptions are short and concise and the icons are relevant to the list item and from phosphoricon. The list should be no more than 6 items. This Virtual List Section uses the primary color of the theme as the background color of the list items - so use this version of the list section when the primary color is a pleasing color to the eye and not too bright. Takes in a title, description, and items[] where each item needs a title, description and icon in the WebsiteConfig config section. This list of icons that can be used are the following: FacebookLogo, LinkedinLogo, TwitterLogo, YoutubeLogo, InstagramLogo, GoogleLogo, CheckCircle, Certificate, Medal, Sparkle, GraduationCap, MedalStar, ChatCenteredText, Hamburger, BeerStein, Lightbulb, ClipboardText, Calculator, CallBell, PhoneCall, EnvelopeSimple, Question, CursorClick, Star, Calendar, CalendarStar, User, Users, MapPin, NavigationArrow, ArrowCircleRight, ArrowSquareOut, Check, Clock, ClockCounterClockwise, Lifebuoy, Gift, CaretRight, CaretLeft, CaretUp, CaretDown, X, HambugerMenu, ChatCircle, PencilLine, Clipboard, Hammer, CheckSquare, Handshake, CalendarCheck, SortAscending, Tag, MegaphoneSimple, ShoppingCart, CurrencyDollar, Heart, Shield, HandsPraying, Tree, Tractor, HardHat, Panorama.
    *         - VisualListSectionRounded: Same as above but with rounded styling and the primary color of the theme lightened to 15% opacity for the background color of the list items. A less bold, more casual appearance. Takes in a title, description, and items[] where each item needs a title, description and icon in the WebsiteConfig config section.
    *         - VisualListSection_configColor: Similar to VisualListSection above, but can take in an odd number of items, so does well with 1, 2, 3, 4, 5, and 6 items. Additionally, you can set the color of the background to primary, secondary or accent. You can use this if too much of the primary is used, or primary is a overly bright color like red. Takes in a title, description, color and items[] where each item needs a title, description and icon in the WebsiteConfig config section.
    *         - ImageBGHero: Full-width section with background image and overlay text. Good for mid-page visual breaks. Can take in an image, title and text in the websiteConfig config definition.
    *         - SplitPortraitTextHeroSection: Split section with portrait photo and text. Perfect for team member highlights or highlights of portrait images. Takes in an image, title and text from websiteConfig in the config defintion for the content.
    *         - TextOnlyCTASection: Text-focused call to action section thats a ribbon of text with a CTA button. Use for strong CTAs without visual distraction for non-primary CTAs that are also important and don't have a specfic page dedicated to them. Example for this are newsletter subscriptions and links to get gift cards, but can be any sort of non-primary, but still important CTA for the business. Takes in a title, text, cta in the WebsiteConfig config definition. Use if there are two important CTAs like a primary contact cta and a subscription cta to subscribe to an email list.
    *         - VisualMenuList: This is specifically for restaurant websites that want to display links to their food and drinks menu for easy access on their website. It will display the menu cover image and title of the specific menu, the title of the food and the drinks menu can be passed in as a food>title and drinks>title in the websiteConfig config definition.
+   *         - iFrameRightContentLeftSection: This is a section that displays the content of a document.write() sccript in an iframe. It requires a title, text, and the a script.src which is the url of the document.write() script.
    *
    *         SERVICE-SPECIFIC SECTIONS:
    *         - ServiceHeroImageOverlay: Service page hero with text overlay on image. Good for service pages with strong relevant imagery. Uses the service image, summary, description and cta for it's content. Can pass in fullHeight=false if the image should not take up the full height of the screen, and showSummary=false if the summary should not be shown in the hero section.
    *         - ServiceHeroImageRight: Service intro with right-aligned image. Standard layout for service detail pages. Uses the service image, summary, description and cta for it's content.
-   *         - ServicesHeroImageRightWaveAnimation - Service intro with right aligned image with a wave animation with the intro content. Goes with sites tht use IntroHeroWaveAnimationBG as the main home page intro. Uses the service image, summary, description and cta for it's content.
+   *         - ServiceHeroImageRightWaveAnimation - Service intro with right aligned image with a wave animation with the intro content. Goes with sites tht use IntroHeroWaveAnimationBG as the main home page intro. Uses the service image, summary, description and cta for it's content.
    *         - ServiceHeroImageTop: Service page with top image banner. Alternative to overlay when text clarity is priority. Uses the service image, summary, description and cta for it's content.
    *         - ServicesOptionsNoImages: Text-only service options list. Good when all services don't have a strong primary image element. Images can be added in the markdown content for the sub service description. Uses the subservice name, description, price and cta for it's content.
    *         - ServicesOptionsTOC: Service options with table of contents. Best for pages with many service subsections. Uses the subservice name and summary for it's content
@@ -1160,13 +1414,13 @@ export interface LVPageConfig {
 export interface LVPayment {
   /**
    * Description
-   * Detailed information about payment policies, options, pricing models, or insurance information.
+   * [Markdown] Detailed information about payment policies, options, pricing models, or insurance information.
    * @default null
    */
   description?: string | null
   /**
    * Insurance
-   * Information about insurance coverage, accepted insurance providers, or related payment options.
+   * [Markdown] Information about insurance coverage, accepted insurance providers, or related payment options.
    * @default null
    */
   insurance?: string | null
@@ -1214,12 +1468,17 @@ export interface LVPeriodData {
 /** PlaceDetails */
 export interface LVPlaceDetails {
   /**
+   * Address Components
+   * @default null
+   */
+  address_components?: LVAddressComponentData[] | null
+  /**
    * Business Status
    * @default null
    */
   business_status?: string | null
   /** @default null */
-  editorial_summary?: LVEditorialSummaryData
+  editorial_summary?: LVEditorialSummaryData | null
   /**
    * Formatted Address
    * @default null
@@ -1259,7 +1518,7 @@ export interface LVPlaceDetails {
    * Website
    * @default null
    */
-  website?: string
+  website?: string | null
 }
 
 /** PlaceDetailsResult */
@@ -1294,7 +1553,7 @@ export interface LVProduct {
   attributes?: LVProductAttribute[] | null
   /**
    * Description
-   * A description of the product.
+   * [Markdown] A description of the product.
    */
   description: string
   /**
@@ -1305,13 +1564,13 @@ export interface LVProduct {
   externalProductLinks?: LVProductLink[] | null
   /**
    * Image
-   * The image of the product.
+   * [Image] The image of the product.
    * @default null
    */
   image?: string | null
   /**
    * Images
-   * Additional images of the product.
+   * [Image] Additional images of the product.
    * @default null
    */
   images?: string[] | null
@@ -1369,18 +1628,18 @@ export interface LVProductBulkImport {
 export interface LVProductGroup {
   /**
    * Description
-   * a description of the product group
+   * [Markdown] a description of the product group
    */
   description: string
   /**
    * Image
-   * the image of the product group
+   * [Image] the image of the product group
    * @default null
    */
   image?: string | null
   /**
    * Images
-   * additional images of the product group
+   * [Image] additional images of the product group
    * @default null
    */
   images?: string[] | null
@@ -1426,13 +1685,13 @@ export interface LVProductLink {
 export interface LVProductVariant {
   /**
    * Image
-   * The image of the variant.
+   * [Image] The image of the variant.
    * @default null
    */
   image?: string | null
   /**
    * Images
-   * Additional images of the variant.
+   * [Image] Additional images of the variant.
    * @default null
    */
   images?: string[] | null
@@ -1564,18 +1823,36 @@ export interface LVSalary {
  * Data model for scrape files
  */
 export interface LVScrapeDataFile {
-  /** Content */
-  content: string
-  /** Description */
-  description: string
-  /** Images */
-  images: LVScrapeImage[]
-  /** Site Name */
-  site_name: string
-  /** Title */
-  title: string
-  /** Url */
-  url: string
+  /**
+   * Content
+   * @default null
+   */
+  content?: string | null
+  /**
+   * Description
+   * @default null
+   */
+  description?: string | null
+  /**
+   * Images
+   * @default null
+   */
+  images?: LVScrapeImage[] | null
+  /**
+   * Site Name
+   * @default null
+   */
+  site_name?: string | null
+  /**
+   * Title
+   * @default null
+   */
+  title?: string | null
+  /**
+   * Url
+   * @default null
+   */
+  url?: string | null
 }
 
 /**
@@ -1592,8 +1869,11 @@ export interface LVScrapeDataFileNames {
  * Data model for scrape images
  */
 export interface LVScrapeImage {
-  /** Alt */
-  alt: string
+  /**
+   * Alt
+   * @default null
+   */
+  alt?: string | null
   /** Url */
   url: string
 }
@@ -1629,7 +1909,7 @@ export interface LVService {
   ctaLink?: string | null
   /**
    * Description
-   * Comprehensive description of the service, its benefits, process, and relevant details. This description should be formatted in markdown and not contain any headings higher than h2.
+   * [Markdown] Comprehensive description of the service, its benefits, process, and relevant details. This description should be formatted in markdown and not contain any headings higher than h2.
    * @default null
    */
   description?: string | null
@@ -1640,7 +1920,7 @@ export interface LVService {
   id: string
   /**
    * Image
-   * Primary image representing the service, used in service listings and detail pages.
+   * [Image] Primary image representing the service, used in service listings and detail pages.
    * @default null
    */
   image?: string | null
@@ -1673,8 +1953,9 @@ export interface LVServiceArea {
   /**
    * Locality
    * City or town name that is part of the business's service area, where they provide services to customers. This should be the official name of the city or town, not a nickname or abbreviation.
+   * @default null
    */
-  locality: string | null
+  locality?: string | null
   /**
    * Postalcode
    * Postal code (zipcode) of the service area.
@@ -1684,8 +1965,9 @@ export interface LVServiceArea {
   /**
    * Region
    * State or region code for the service area locality, typically the two-letter state code in the US, such as 'TX'.
+   * @default null
    */
-  region: string
+  region?: string | null
 }
 
 /** SiteData */
@@ -1717,6 +1999,136 @@ export interface LVSiteData {
   version: number
   /** @default null */
   websiteConfig?: LVWebsiteConfig | null
+}
+
+/** SiteStoryData */
+export interface LVSiteStoryData {
+  /**
+   * Addressstring
+   * The address of the event or project if available. Can be a full address, or just a street address, zipcode or city, and a state
+   * @default null
+   */
+  addressString?: string | null
+  /**
+   * Author
+   * When the type of story is blog, this is the author's name of the post.
+   * @default null
+   */
+  author?: string | null
+  /**
+   * Content
+   * When the type of story is blog or project-gallery, this is the content of the post or description of the project. This description should be formatted in markdown and not contain any headings higher than h2.
+   * @default null
+   */
+  content?: string | null
+  /**
+   * Created At
+   * Date and time for when the model object was created.
+   * @default null
+   */
+  created_at?: string | null
+  /**
+   * Ctaaction
+   * The URL that links to the details of the event. Can be an internal URL to the website if the event has an associated story, or an external url
+   * @default null
+   */
+  ctaAction?: string | null
+  /**
+   * Description
+   * The description of the event
+   * @default null
+   */
+  description?: string | null
+  /**
+   * Feedbackref
+   * The feedback.id of any feedback associated with this event
+   * @default null
+   */
+  feedbackRef?: string[] | null
+  /**
+   * Headerimage
+   * [Image] When the type of story is blog or project-gallery, this is the name of the image to use as the header of the post or project. This is required for both types of stories.
+   * @default null
+   */
+  headerImage?: string | null
+  /**
+   * Id
+   * Unique uuid for the model object.
+   * @default null
+   */
+  id?: string | null
+  /**
+   * Images
+   * [Image] When the type of story is image-gallery, this will be populated with a list of image names.
+   * @default null
+   */
+  images?: string[] | null
+  /**
+   * Locationref
+   * If a multi-location business, the location.id(s) referred to in the story
+   * @default null
+   */
+  locationRef?: string[] | null
+  /**
+   * Postedat
+   * When the type of story is blog, this is the date and time the post was created or published. If the story is a project-gallery, this is the date and time the project was completed.
+   * @default null
+   */
+  postedAt?: string | null
+  /**
+   * Productref
+   * List of product.slug's of products referred to in the story.
+   * @default null
+   */
+  productRef?: string[] | null
+  /**
+   * Schedule
+   * The individual days and the times within those days of the event.
+   * @default null
+   */
+  schedule?: LVEventStorySchedule[] | null
+  /**
+   * Serviceref
+   * List service.id's of services provided by the business referred to in the story.
+   * @default null
+   */
+  serviceRef?: string[] | null
+  /**
+   * Shortcontent
+   * When the type of the story is blog or project-gallery, this is a shortened summary of the content of the post or project description.
+   * @default null
+   */
+  shortContent?: string | null
+  /**
+   * Story Id
+   * Human readable slug identifier for the story. If the story is converted from a blog post, event or other content, this will be the slug of the original content.
+   * @default null
+   */
+  story_id?: string | null
+  /**
+   * Tags
+   * List of keywords and phrases to help describe or categorize the story.
+   * @default null
+   */
+  tags?: string[] | null
+  /**
+   * Title
+   * When the type of story is blog or project-gallery, this is the title of the post or project.
+   * @default null
+   */
+  title?: string | null
+  /**
+   * Type
+   * Indicates the type of the story which must be one of the following: blog, image-gallery, project-gallery, or before-after.
+   * @default null
+   */
+  type?: string | null
+  /**
+   * Updated At
+   * Date and time for when the model object was last updated.
+   * @default null
+   */
+  updated_at?: string | null
 }
 
 /** SiteVersionInput */
@@ -1859,7 +2271,7 @@ export interface LVSubService {
   ctaLink?: string | null
   /**
    * Description
-   * Detailed description of the sub-service, its benefits, process, and any other relevant information. This description should be formatted in markdown and not contain any headings higher than h2.
+   * [Markdown] Detailed description of the sub-service, its benefits, process, and any other relevant information. This description should be formatted in markdown and not contain any headings higher than h2.
    * @default null
    */
   description?: string | null
@@ -1871,7 +2283,7 @@ export interface LVSubService {
   id?: string | null
   /**
    * Image
-   * Image representing the sub-service, used in service listings and detail views.
+   * [Image] Image representing the sub-service, used in service listings and detail views.
    * @default null
    */
   image?: string | null
@@ -2101,6 +2513,11 @@ export interface LVUserData {
    */
   id?: string | null
   /**
+   * Is Internal
+   * @default null
+   */
+  is_internal?: boolean | null
+  /**
    * Last Name
    * @default null
    */
@@ -2167,12 +2584,12 @@ export interface LVWebsiteConfig {
   header?: LVHeader | null
   /**
    * Navigation
-   * List of navigation items defining the main menu structure of the website. A site should always have a home page, services page and about page. If converting from a previous website, this should include the previous website's navigation items and be ordered in the same way as the previous website. The standard sections/routes for our menu include 'home', 'services', 'about', 'contact', 'blog', 'events', 'locations', 'gallery', and 'faq'. Do not include a contact page, as our footer has contact information across all pages. Where it's relevant or where previous sites have special menu items, a special page can be created from a story. You can see an example of this on kateyvillalon's site with the IMAGO page.
+   * List of navigation items defining the main menu structure of the website. A site should always have a home page, services page and about page. If converting from a previous website, this should include the previous website's navigation items and be ordered in the same way as the previous website. The sections/routes for our navigation include 'Home', 'Services', 'About', 'Blog', 'Events', 'Locations', 'Gallery', 'Jobs', 'Menu', 'Drinks', 'Food'. and 'faq'. Do not include a contact page, as our footer has contact information across all pages. Where it's relevant or where previous sites have special menu items, a special page can be created from a story. You can see an example of this on kateyvillalon's site with the IMAGO page. Every website should at least have the following pages: Home, Services, Locations and About.
    */
   navigation: LVNavigationItem[]
   /**
    * Pageconfig
-   * List of page names with their section configurations, defining the structure of different page types.
+   * List of page names with their section configurations, defining the structure of different page types. The following pages need ALL sections of the page defined in websiteConfig: Home, ServicePage, EventsPage, GalleryPage, JobsPage, MenuPage, FoodPage, DrinksPage. The following pages have the core content for that section embedded already in the page, and don't need them added to websiteConfig, as doing that would duplicate content or look funny wth a hero section in the middle of the page: FAQ - already has the FAQ section embedded, only add sections that would go well beneath the FAQ. About - already has the about section embedded, only add sections that would go well beneath the about section. Locations - already has the locations section embedded, only add sections that would go well beneath the locations section. Blog - already has the blog section embedded, only add sections that would go well beneath the blog section.
    */
   pageConfig: LVPageConfig[]
   /**
@@ -2530,6 +2947,119 @@ export class LVAPI<SecurityDataType extends unknown> {
       }),
 
     /**
+     * No description
+     *
+     * @tags feedback
+     * @name V1AccountFeedbackList
+     * @summary Get feedback for the current account with optional pagination
+     * @request GET:/api/v1/account/feedback
+     */
+    v1AccountFeedbackList: (
+      query?: {
+        /**
+         * Source
+         * Filter by feedback source
+         * @default null
+         */
+        source?: string | null
+        /**
+         * Limit
+         * Limit the number of results
+         * @default null
+         */
+        limit?: number | null
+        /**
+         * Skip
+         * Skip the first N results
+         * @default 0
+         */
+        skip?: number | null
+      },
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVFeedbackListResponse, any>({
+        path: `/api/v1/account/feedback`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags feedback
+     * @name V1AccountFeedbackCreate
+     * @summary Create new feedback
+     * @request POST:/api/v1/account/feedback
+     */
+    v1AccountFeedbackCreate: (
+      data: LVFeedbackItem,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVFeedbackItem, any>({
+        path: `/api/v1/account/feedback`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags feedback
+     * @name V1AccountFeedbackDelete
+     * @summary Delete feedback by its ID
+     * @request DELETE:/api/v1/account/feedback/{feedback_id}
+     */
+    v1AccountFeedbackDelete: (feedbackId: string, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/v1/account/feedback/${feedbackId}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags feedback
+     * @name V1AccountFeedbackDetail
+     * @summary Get a specific feedback by its ID
+     * @request GET:/api/v1/account/feedback/{feedback_id}
+     */
+    v1AccountFeedbackDetail: (feedbackId: string, params: RequestParams = {}) =>
+      this.http.request<LVFeedbackItem, any>({
+        path: `/api/v1/account/feedback/${feedbackId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags feedback
+     * @name V1AccountFeedbackUpdate
+     * @summary Update existing feedback
+     * @request PUT:/api/v1/account/feedback/{feedback_id}
+     */
+    v1AccountFeedbackUpdate: (
+      feedbackId: string,
+      data: LVFeedbackItem,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVFeedbackItem, any>({
+        path: `/api/v1/account/feedback/${feedbackId}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
  * No description
  *
  * @tags dfseo
@@ -2565,6 +3095,29 @@ export class LVAPI<SecurityDataType extends unknown> {
       this.http.request<LVGoogleBusinessInfoBusinessDataSerpElementItem, any>({
         path: `/api/v1/dfseo/business_info/task/${taskId}`,
         method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+ * No description
+ *
+ * @tags google
+ * @name V1GoogleAddressList
+ * @summary 
+    Get business info request for a place_id
+ * @request GET:/api/v1/google/address
+ */
+    v1GoogleAddressList: (
+      query: {
+        input: string
+      },
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVEstablishment[], any>({
+        path: `/api/v1/google/address`,
+        method: "GET",
+        query: query,
         format: "json",
         ...params,
       }),
@@ -2626,6 +3179,28 @@ export class LVAPI<SecurityDataType extends unknown> {
         path: `/api/v1/health`,
         method: "GET",
         query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+ * No description
+ *
+ * @tags llm
+ * @name V1LlmImproveTextCreate
+ * @summary 
+    Create a new account
+ * @request POST:/api/v1/llm/improveText
+ */
+    v1LlmImproveTextCreate: (
+      data: LVLLMImproveTextInput,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVLLMImproveTextOutput, any>({
+        path: `/api/v1/llm/improveText`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -2710,11 +3285,30 @@ export class LVAPI<SecurityDataType extends unknown> {
       data: LVBusinessLocationInput,
       params: RequestParams = {}
     ) =>
-      this.http.request<LVLocation[], any>({
+      this.http.request<LVLocation, any>({
         path: `/api/v1/site/business/location`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteBusinessLocationRefreshPartialUpdate
+     * @summary Get the profile of the currently authenticated user
+     * @request PATCH:/api/v1/site/business/location/{location_id}/refresh
+     */
+    v1SiteBusinessLocationRefreshPartialUpdate: (
+      locationId: string,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVLocation, any>({
+        path: `/api/v1/site/business/location/${locationId}/refresh`,
+        method: "PATCH",
         format: "json",
         ...params,
       }),
@@ -2785,6 +3379,62 @@ export class LVAPI<SecurityDataType extends unknown> {
       this.http.request<LVForms, any>({
         path: `/api/v1/site/forms`,
         method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsDataCreate
+     * @request POST:/api/v1/site/forms/data
+     */
+    v1SiteFormsDataCreate: (
+      data: LVFormDataInput,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVFormData, any>({
+        path: `/api/v1/site/forms/data`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsDataDetail
+     * @request GET:/api/v1/site/forms/data/{data_id}
+     */
+    v1SiteFormsDataDetail: (dataId: string, params: RequestParams = {}) =>
+      this.http.request<LVFormData, any>({
+        path: `/api/v1/site/forms/data/${dataId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags site
+     * @name V1SiteFormsDataUpdate
+     * @request PUT:/api/v1/site/forms/data/{data_id}
+     */
+    v1SiteFormsDataUpdate: (
+      dataId: string,
+      data: LVFormDataInput,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVFormData, any>({
+        path: `/api/v1/site/forms/data/${dataId}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -3094,6 +3744,103 @@ export class LVAPI<SecurityDataType extends unknown> {
       this.http.request<LVSiteData, any>({
         path: `/api/v1/site/revert/${versionNumber}`,
         method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags stories
+     * @name V1SiteStoriesList
+     * @summary Get all stories for the current site
+     * @request GET:/api/v1/site/stories
+     */
+    v1SiteStoriesList: (
+      query?: {
+        /**
+         * Type
+         * @default null
+         */
+        type?: string
+      },
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVSiteStoryData[], any>({
+        path: `/api/v1/site/stories`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags stories
+     * @name V1SiteStoriesCreate
+     * @summary Create or update a story
+     * @request POST:/api/v1/site/stories
+     */
+    v1SiteStoriesCreate: (data: LVSiteStoryData, params: RequestParams = {}) =>
+      this.http.request<LVSiteStoryData, any>({
+        path: `/api/v1/site/stories`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags stories
+     * @name V1SiteStoriesDelete
+     * @summary Delete a specific story by its story ID
+     * @request DELETE:/api/v1/site/stories/{story_id}
+     */
+    v1SiteStoriesDelete: (storyId: string, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/v1/site/stories/${storyId}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags stories
+     * @name V1SiteStoriesDetail
+     * @summary Get a specific story by its story ID
+     * @request GET:/api/v1/site/stories/{story_id}
+     */
+    v1SiteStoriesDetail: (storyId: string, params: RequestParams = {}) =>
+      this.http.request<LVSiteStoryData, any>({
+        path: `/api/v1/site/stories/${storyId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags stories
+     * @name V1SiteStoriesUpdate
+     * @summary Create or update a story
+     * @request PUT:/api/v1/site/stories/{story_id}
+     */
+    v1SiteStoriesUpdate: (
+      storyId: string,
+      data: LVSiteStoryData,
+      params: RequestParams = {}
+    ) =>
+      this.http.request<LVSiteStoryData, any>({
+        path: `/api/v1/site/stories/${storyId}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
